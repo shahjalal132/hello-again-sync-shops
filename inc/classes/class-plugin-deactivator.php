@@ -10,7 +10,12 @@
 class Plugin_Deactivator {
 
     public static function deactivate() {
-        // Define your code here
+
+        // Drop sync users table
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'sync_users';
+        $sql        = "DROP TABLE IF EXISTS $table_name;";
+        $wpdb->query( $sql );
     }
 
 }
