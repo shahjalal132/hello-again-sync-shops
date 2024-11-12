@@ -18,8 +18,9 @@ class Plugin_Activator {
 
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id INT AUTO_INCREMENT,
-            track_number INT(50) UNIQUE NOT NULL,
-            email VARCHAR(100) NOT NULL,
+            user_id VARCHAR(255) UNIQUE NOT NULL,
+            -- email VARCHAR(100) UNIQUE NOT NULL,
+            email VARCHAR(100) NULL,
             user_data LONGTEXT NOT NULL,
             status VARCHAR(20) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

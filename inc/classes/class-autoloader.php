@@ -16,5 +16,6 @@ class Autoloader {
         I18n::get_instance();
         Enqueue_Assets::get_instance();
         Users_Post_Type::get_instance();
+        API_DB_Factory::get_instance();
     }
 }
