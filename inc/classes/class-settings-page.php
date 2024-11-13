@@ -30,9 +30,7 @@ class Settings_Page {
     }
 
     public function ha_options_page_html() {
-        echo '<div class="wrap">';
-        echo '<h1>HA Options</h1>';
-        echo '</div>';
+        include_once PLUGIN_BASE_PATH . '/template-parts/settings-page.php';
     }
 
 }
