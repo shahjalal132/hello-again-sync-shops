@@ -195,32 +195,28 @@ class API_DB_Factory {
                 $last_name   = $user_data['last_name'] ?? '';
                 $full_name   = trim( "$first_name $middle_name $last_name" );
 
-                // User details
-                $company      = $user_data['company'] ?? '';
-                $phone_number = $user_data['phone_number'] ?? '';
-                $birthday     = $user_data['birthday'] ?? '';
-                $gender       = $user_data['gender'] ?? '';
-                $points       = $user_data['points'] ?? 0;
-
-                // User Address
-                $address       = $user_data['address'] ?? '';
-                $street        = $address['street'] ?? '';
-                $city_code     = $address['city_code'] ?? '';
-                $city          = $address['city'] ?? '';
-                $street_number = $address['street_number'] ?? '';
-                $state         = $address['state'] ?? '';
-                $country       = $address['country'] ?? '';
-
-                // User custom fields
-                $custom_fields = $user_data['custom_fields'] ?? [];
-
-                // Social media
-                $fbid          = $user_data['fbid'] ?? '';
-                $apple_user_id = $user_data['apple_user_id'] ?? '';
-                $google_id     = $user_data['google_id'] ?? '';
-
                 // User Status
                 $status = $user_data['status'] ?? [];
+
+                // Collect user data
+                $meta_data = [
+                    '_email'         => $email,
+                    '_company'       => $user_data['company'] ?? '',
+                    '_phone_number'  => $user_data['phone_number'] ?? '',
+                    '_birthday'      => $user_data['birthday'] ?? '',
+                    '_gender'        => $user_data['gender'] ?? '',
+                    '_points'        => $user_data['points'] ?? 0,
+                    '_street'        => $user_data['address']['street'] ?? '',
+                    '_city_code'     => $user_data['address']['city_code'] ?? '',
+                    '_city'          => $user_data['address']['city'] ?? '',
+                    '_street_number' => $user_data['address']['street_number'] ?? '',
+                    '_state'         => $user_data['address']['state'] ?? '',
+                    '_country'       => $user_data['address']['country'] ?? '',
+                    '_fbid'          => $user_data['fbid'] ?? '',
+                    '_apple_user_id' => $user_data['apple_user_id'] ?? '',
+                    '_google_id'     => $user_data['google_id'] ?? '',
+                    '_status'        => json_encode( $status ),
+                ];
 
                 $photos_urls = [];
                 $photos      = $user_data['photos'];
@@ -271,23 +267,8 @@ class API_DB_Factory {
                     add_post_meta( $post_id, '_sync_user_id', $user_id, true );
                 }
 
-                // Update additional metadata
-                update_post_meta( $post_id, '_email', $email );
-                update_post_meta( $post_id, '_company', $company );
-                update_post_meta( $post_id, '_phone_number', $phone_number );
-                update_post_meta( $post_id, '_birthday', $birthday );
-                update_post_meta( $post_id, '_gender', $gender );
-                update_post_meta( $post_id, '_points', $points );
-                update_post_meta( $post_id, '_street', $street );
-                update_post_meta( $post_id, '_city_code', $city_code );
-                update_post_meta( $post_id, '_city', $city );
-                update_post_meta( $post_id, '_street_number', $street_number );
-                update_post_meta( $post_id, '_state', $state );
-                update_post_meta( $post_id, '_country', $country );
-                update_post_meta( $post_id, '_fbid', $fbid );
-                update_post_meta( $post_id, '_apple_user_id', $apple_user_id );
-                update_post_meta( $post_id, '_google_id', $google_id );
-                update_post_meta( $post_id, '_status', $status );
+                // Serialize and store the user data array as a single meta field
+                update_post_meta( $post_id, '_sync_users', $meta_data );
 
                 // Set the photo URL as the featured image if available
                 if ( !empty( $photos_urls ) ) {

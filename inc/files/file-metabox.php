@@ -108,19 +108,19 @@ CSF::createSection( $prefix_page_opts, array(
         array(
             'id'    => '_fbid',
             'type'  => 'text',
-            'title' => 'Facebook',
+            'title' => 'Facebook ID',
             'placeholder' => 'Enter facebook id',
         ),
         array(
             'id'    => '_apple_user_id',
             'type'  => 'text',
-            'title' => 'Apple',
+            'title' => 'Apple User ID',
             'placeholder' => 'Enter apple id',
         ),
         array(
             'id'    => '_google_id',
             'type'  => 'text',
-            'title' => 'Google',
+            'title' => 'Google ID',
             'placeholder' => 'Enter google id',
         ),
     ),
