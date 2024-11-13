@@ -29,49 +29,81 @@ class API_DB_Factory {
 
     public function insert_user() {
         try {
-
-            $users_json = $this->fetch_users_from_api();
-            // $this->put_program_logs( 'User: ' . $users );
+            // Fetch the first page to get total users and pages.
+            $users_json = $this->fetch_users_from_api( 1 );
 
             if ( empty( $users_json ) ) {
                 return new \WP_Error( 'no_users', 'No users found to insert', [ 'status' => 404 ] );
             }
 
-            $users       = [];
+            // Initialize variables
+            $total_users = 0;
+            $total_pages = 0;
+
+            // Decode JSON
             $users_array = json_decode( $users_json, true );
-            if ( array_key_exists( 'results', $users_array ) ) {
-                $users = $users_array['results'];
-            } else {
-                $users = $users_array;
+
+            // Get total users
+            if ( array_key_exists( 'count', $users_array ) ) {
+                $total_users = $users_array['count'];
             }
+
+            // Update total users to options table
+            update_option( 'sync_total_users', $total_users );
+
+            // Calculate total pages
+            $total_pages = ceil( $total_users / 100 );
+
+            // Update total pages to options table
+            update_option( 'sync_total_pages', $total_pages );
 
             global $wpdb;
             $table_name = $wpdb->prefix . 'sync_users';
 
-            foreach ( $users as $user ) {
+            // Get the last processed page from options table or start from 1
+            $start_page = get_option( 'sync_current_page', 1 );
 
-                $user_id   = $user['id'];
-                $email     = $user['email'] ?? null;
-                $user_data = json_encode( $user );
-                $status    = 'pending';
+            // Loop through all pages starting from the last unprocessed page
+            for ( $page = $start_page; $page <= $total_pages; $page++ ) {
 
-                $sql = $wpdb->prepare(
-                    "INSERT INTO $table_name (user_id, email, user_data, status) VALUES (%s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE user_data = %s, status = %s",
-                    $user_id,
-                    $email,
-                    $user_data,
-                    $status,
-                    $user_data,
-                    $status
-                );
+                // Fetch users
+                $users_json  = $this->fetch_users_from_api( $page );
+                // Decode JSON
+                $users_array = json_decode( $users_json, true );
 
-                $result = $wpdb->query( $sql );
+                // Update current page to options table
+                update_option( 'sync_current_page', $page );
 
-                if ( $result === false ) {
-                    return new \WP_Error( 'db_error', 'Failed to insert or update user in database', [ 'status' => 500 ] );
+                // Get users on the current page
+                $users = $users_array['results'] ?? [];
+
+                foreach ( $users as $user ) {
+                    $user_id   = $user['id'];
+                    $email     = $user['email'] ?? null;
+                    $user_data = json_encode( $user );
+                    $status    = 'pending';
+
+                    $sql = $wpdb->prepare(
+                        "INSERT INTO $table_name (user_id, email, user_data, status) VALUES (%s, %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE user_data = %s, status = %s",
+                        $user_id,
+                        $email,
+                        $user_data,
+                        $status,
+                        $user_data,
+                        $status
+                    );
+
+                    $result = $wpdb->query( $sql );
+
+                    if ( $result === false ) {
+                        return new \WP_Error( 'db_error', 'Failed to insert or update user in database', [ 'status' => 500 ] );
+                    }
                 }
             }
+
+            // Reset current page after all pages have been processed
+            update_option( 'sync_current_page', 1 );
 
             return 'All users inserted or updated successfully.';
 
@@ -80,7 +112,7 @@ class API_DB_Factory {
         }
     }
 
-    public function fetch_users_from_api() {
+    public function fetch_users_from_api( $page = 1 ) {
 
         // Credentials
         $api_base_url = '';
@@ -95,7 +127,7 @@ class API_DB_Factory {
 
         $curl = curl_init();
         curl_setopt_array( $curl, array(
-            CURLOPT_URL            => $api_base_url . '/users/?limit=100',
+            CURLOPT_URL            => $api_base_url . '/users/?limit=100&page=' . $page,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING       => '',
             CURLOPT_MAXREDIRS      => 10,
