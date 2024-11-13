@@ -30,7 +30,8 @@ class Enqueue_Assets {
      * @return void
      */
     public function enqueue_admin_assets( $page_now ) {
-        // enqueue admin css
+
+        wp_enqueue_style( "wpb-bootstrap-admin", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/bootstrap.min.css", [], false, "all" );
 
         /**
          * enqueue admin js
@@ -39,7 +40,7 @@ class Enqueue_Assets {
          * first check if the current page is you want to enqueue page
          */
         if ( 'options-general.php' === $page_now ) {
-            wp_enqueue_script( "wpb-admin-js", PLUGIN_ASSETS_DIR_URL . "/js/admin-script.js", [ 'jquery' ], time(), true ); // replace time() to version number when in production
+            wp_enqueue_script( "wpb-admin-js", PLUGIN_ADMIN_ASSETS_DIR_URL . "/js/admin-script.js", [ 'jquery' ], time(), true ); // replace time() to version number when in production
         }
     }
 
@@ -53,12 +54,12 @@ class Enqueue_Assets {
         wp_enqueue_style( "wpb-bootstrap", PLUGIN_PUBLIC_ASSETS_URL . "/css/bootstrap.min.css", [], false, "all" );
 
         // enqueue public js    
-        wp_enqueue_script( "wpb-public-js", PLUGIN_PUBLIC_ASSETS_URL . "/js/public-script.js", ['jquery'], time(), true );
+        wp_enqueue_script( "wpb-public-js", PLUGIN_PUBLIC_ASSETS_URL . "/js/public-script.js", [ 'jquery' ], time(), true );
 
         wp_localize_script( 'wpb-public-js', 'load_more_params', [
-            'ajax_url' => admin_url( 'admin-ajax.php' ),
+            'ajax_url'       => admin_url( 'admin-ajax.php' ),
             'posts_per_page' => 9,
-        ]);
+        ] );
     }
 
 }
