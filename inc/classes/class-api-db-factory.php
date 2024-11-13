@@ -17,6 +17,8 @@ class API_DB_Factory {
     public function setup_hooks() {
         // Register REST route for inserting users to database
         add_action( 'rest_api_init', [ $this, 'register_rest_route' ] );
+        add_shortcode( 'helloagain_insert_users_db', [ $this, 'insert_user' ] );
+        add_shortcode( 'helloagain_sync_users_api', [ $this, 'sync_users' ] );
     }
 
     public function register_rest_route() {
