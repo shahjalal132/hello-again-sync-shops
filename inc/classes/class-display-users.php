@@ -103,8 +103,12 @@ class Display_Users {
                 // Reset Post Data
                 wp_reset_postdata();
                 ?>
-
             </div>
+
+            <div class="text-center">
+                <button type="button" class="btn btn-primary mt-3" id="btn-load-more">Load More</button>
+            </div>
+
         </div>
 
         <?php
