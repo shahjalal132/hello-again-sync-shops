@@ -73,12 +73,13 @@ class Display_Users {
                                 <div class="card-body">
                                     <!-- Dynamic title -->
                                     <h5 class="card-title"><?php echo esc_html( $title ); ?></h5>
-                                    <p class="card-text">
+                                    <p class="card-text mb-0">
                                         <!-- Dynamic address -->
                                         <?php echo wp_kses_post( nl2br( $address ) ); ?><br>
                                         <!-- Dynamic email -->
                                         <?php if ( $email ) : ?>
-                                            <a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a><br>
+                                            <a href="mailto:<?php echo esc_attr( $email ); ?>"
+                                                class="color-gold"><?php echo esc_html( $email ); ?></a><br>
                                         <?php endif; ?>
                                         <!-- Dynamic phone -->
                                         <?php if ( $phone ) : ?>
@@ -86,11 +87,11 @@ class Display_Users {
                                         <?php endif; ?>
                                     </p>
                                     <?php if ( $website ) : ?>
-                                        <a href="<?php echo esc_url( $website ); ?>" class="link text-primary" target="_blank">zur
+                                        <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
                                             Website</a>
                                     <?php endif; ?>
                                     <a href="https://maps.google.com/?q=<?php echo urlencode( strip_tags( $address ) ); ?>"
-                                        class="link text-primary" target="_blank">Route in Google anzeigen</a>
+                                        class="link color-gold" target="_blank">Route in Google anzeigen</a>
                                 </div>
                             </div>
                         </div>
