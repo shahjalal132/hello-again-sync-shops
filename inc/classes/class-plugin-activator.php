@@ -32,4 +32,28 @@ class Plugin_Activator {
         dbDelta( $sql );
     }
 
+    public static function create_user_page() {
+        // Define the page title and content with your shortcode
+        $page_title   = 'Sync Users';
+        $page_content = '[helloagain_sync_users]';
+        $page_slug    = 'helloagain-sync-users';
+
+        // Check if a page with this title or slug already exists
+        $existing_page = get_page_by_path( $page_slug );
+
+        if ( !$existing_page ) {
+            // Page doesn't exist, so create it
+            $page_data = array(
+                'post_title'   => $page_title,
+                'post_content' => $page_content,
+                'post_status'  => 'publish',
+                'post_type'    => 'page',
+                'post_author'  => 1,
+            );
+
+            // Insert the page into the database
+            wp_insert_post( $page_data );
+        }
+    }
+
 }

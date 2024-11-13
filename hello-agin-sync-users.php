@@ -61,6 +61,7 @@ require_once PLUGIN_BASE_PATH . '/inc/helpers/autoloader.php';
 function wpb_plugin_activator() {
     require_once PLUGIN_BASE_PATH . '/inc/classes/class-plugin-activator.php';
     Plugin_Activator::activate();
+    Plugin_Activator::create_user_page();
 }
 
 // Register activation hook
@@ -76,7 +77,7 @@ function wpb_plugin_deactivator() {
 }
 
 // Register deactivation hook
-register_deactivation_hook( __FILE__, 'wpb_plugin_deactivator' );
+// register_deactivation_hook( __FILE__, 'wpb_plugin_deactivator' );
 
 
 function get_plugin_instance() {
