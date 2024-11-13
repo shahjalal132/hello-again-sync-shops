@@ -53,7 +53,12 @@ class Enqueue_Assets {
         wp_enqueue_style( "wpb-bootstrap", PLUGIN_PUBLIC_ASSETS_URL . "/css/bootstrap.min.css", [], false, "all" );
 
         // enqueue public js    
-        wp_enqueue_script( "wpb-public-js", PLUGIN_PUBLIC_ASSETS_URL . "/js/public-script.js", [], time(), true );
+        wp_enqueue_script( "wpb-public-js", PLUGIN_PUBLIC_ASSETS_URL . "/js/public-script.js", ['jquery'], time(), true );
+
+        wp_localize_script( 'wpb-public-js', 'load_more_params', [
+            'ajax_url' => admin_url( 'admin-ajax.php' ),
+            'posts_per_page' => 9,
+        ]);
     }
 
 }
