@@ -54,7 +54,7 @@ class Shops_Post_Type {
             'label'               => __( 'Shop', 'hello-again' ),
             'description'         => __( 'Shops', 'hello-again' ),
             'labels'              => $labels,
-            'supports'            => array( 'title', 'thumbnail' ),
+            'supports'            => array( 'title', 'thumbnail', 'editor' ),
             // 'taxonomies'          => array( 'category', 'post_tag' ),
             'hierarchical'        => false,
             'public'              => true,

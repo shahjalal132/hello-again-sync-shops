@@ -1,0 +1,44 @@
+Shop Data: 
+{
+    "id": 28687,
+    "name": "20’erl Pub",
+    "fb_page_id": "102150195073496",
+    "address": {
+        "street": "Dorfplatz 5",
+        "city_code": "6365",
+        "city": "Kirchberg in Tirol",
+        "location": {
+            "type": "Point",
+            "coordinates": [
+                12.3140455,
+                47.4474572
+            ]
+        },
+        "auto_location": true
+    },
+    "phone_number": "+43 664 6488 652",
+    "description": null,
+    "homepage": "",
+    "email": "pub20erl@gmail.com",
+    "category": 1112,
+    "image": null,
+    "logo": "https://helloagain-storage.storage.googleapis.com:443/media/clients/brixentaler/images/ddb153e7-ad51646902252254.jpg",
+    "image_url": null,
+    "logo_url": null,
+    "is_featured": false,
+    "opening_hours": [],
+    "certificate_common_name": "UID ATU63513059",
+    "google_places_id": null,
+    "client": {
+        "id": "ac4b63ad-00f7-461c-86d7-2ab2650bcb45",
+        "super_client_id": null,
+        "name": "Der Brixentaler",
+        "is_subclient": false
+    },
+    "translations": [],
+    "identifier": null,
+    "internal_name": null,
+    "sync_details": false,
+    "archived": false
+} - 2024-11-14 05:23:51
+

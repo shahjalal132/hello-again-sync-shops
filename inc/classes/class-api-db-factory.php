@@ -21,6 +21,8 @@ class API_DB_Factory {
         add_action( 'rest_api_init', [ $this, 'register_rest_route' ] );
         add_shortcode( 'helloagain_insert_users_db', [ $this, 'insert_user' ] );
         add_shortcode( 'helloagain_sync_users_api', [ $this, 'sync_users' ] );
+        add_shortcode( 'helloagain_sync_shops_db', [ $this, 'insert_shops' ] );
+        add_shortcode( 'helloagain_sync_shops_api', [ $this, 'sync_shops' ] );
 
         $credentials_file = PLUGIN_BASE_PATH . '/credentials.json';
         if ( file_exists( $credentials_file ) ) {
@@ -47,6 +49,12 @@ class API_DB_Factory {
         register_rest_route( 'hello-again/v1', '/insert-shops', [
             'methods'             => 'GET',
             'callback'            => [ $this, 'insert_shops' ],
+            'permission_callback' => '__return_true',
+        ] );
+
+        register_rest_route( 'hello-again/v1', '/sync-shops', [
+            'methods'             => 'GET',
+            'callback'            => [ $this, 'sync_shops' ],
             'permission_callback' => '__return_true',
         ] );
     }
@@ -261,6 +269,11 @@ class API_DB_Factory {
                         'post_title' => $full_name,
                     ] );
 
+                    // Set the photo URL as the featured image if available
+                    if ( !empty( $photos_urls ) ) {
+                        $this->set_featured_image_from_url( $post_id, $photos_urls );
+                    }
+
                 } else {
                     // User does not exist, create a new user post
                     $post_id = wp_insert_post( [
@@ -393,7 +406,7 @@ class API_DB_Factory {
                 $shops = $fetched_shop_array['results'] ?? [];
 
                 foreach ( $shops as $shop ) {
-                    
+
                     $shop_id   = $shop['id'];
                     $shop_data = json_encode( $shop );
                     $status    = 'pending';
@@ -448,6 +461,139 @@ class API_DB_Factory {
 
         curl_close( $curl );
         return $response;
+    }
+
+    public function sync_shops() {
+        try {
+
+            $limit = 1;
+
+            // Fetch shops from the database
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'sync_shops';
+
+            $sql   = "SELECT * FROM $table_name WHERE status = 'pending' LIMIT $limit";
+            $shops = $wpdb->get_results( $sql );
+
+            if ( empty( $shops ) ) {
+                return new \WP_Error( 'no_pending_shops', 'No pending Shops found', [ 'status' => 404 ] );
+            }
+
+            foreach ( $shops as $shop ) {
+
+                $shop_id   = $shop->shop_id;
+                $shop_data = json_decode( $shop->shop_data, true );
+                // $this->put_program_logs( 'Shop Data: ' . json_encode( $shop_data ) );
+
+                // retrieve shop data
+                $shop_name   = $shop_data['name'] ?? '';
+                $description = $shop_data['description'] ?? '';
+
+                // retrieve logo
+                $logo        = $shop_data['logo'] ?? '';
+                $photos_urls = [
+                    [
+                        'url'   => $logo,
+                        'order' => 1,
+                    ],
+                ];
+
+                // retrieve address
+                $address   = $shop_data['address'] ?? [];
+                $street    = $address['street'] ?? '';
+                $city_code = $address['city_code'] ?? '';
+                $city      = $address['city'] ?? '';
+                $location  = $address['location'] ?? [];
+
+                $category      = $shop_data['category'] ?? '';
+                $client        = $shop_data['client'] ?? [];
+                $opening_hours = $shop_data['opening_hours'] ?? [];
+
+                $meta_data = [
+                    '_fb_page_id  '            => $shop_data['fb_page_id'] ?? '',
+                    '_address'                 => $street,
+                    '_city_code'               => $city_code,
+                    '_city'                    => $city,
+                    '_phone_number'            => $shop_data['phone_number'] ?? '',
+                    '_description'             => $description,
+                    '_email'                   => $shop_data['email'] ?? '',
+                    '_certificate_common_name' => $shop_data['certificate_common_name'] ?? '',
+                    '_category'                => $category,
+                    '_google_places_id'        => $shop_data['google_places_id'] ?? '',
+                    '_client'                  => $client,
+                    '_opening_hours'           => $opening_hours,
+                    '_location'                => $location,
+                    '_image_url'               => $shop_data['image_url'] ?? '',
+                    '_logo_url'                => $shop_data['logo_url'] ?? '',
+                ];
+
+                // Check if user already exists in sync_shops post type by _sync_shop_id meta key
+                $existing_user_query = new \WP_Query( [
+                    'post_type'  => 'sync_shops',
+                    'meta_query' => [
+                        [
+                            'key'     => '_sync_shop_id',
+                            'value'   => $shop_id,
+                            'compare' => '=',
+                        ],
+                    ],
+                    'fields'     => 'ids',
+                ] );
+
+                // Check if shop exists
+                if ( $existing_user_query->have_posts() ) {
+                    // User exists, get the post ID and update
+                    $post_id = $existing_user_query->posts[0];
+
+                    // Update shop info
+                    wp_update_post( [
+                        'ID'           => $post_id,
+                        'post_title'   => $shop_name,
+                        'post_content' => $description,
+                    ] );
+
+                    // update shops meta data
+                    update_post_meta( $post_id, '_sync_shop_info', $meta_data );
+
+                    // Set the photo URL as the featured image if available
+                    if ( !empty( $photos_urls ) ) {
+                        $this->set_featured_image_from_url( $post_id, $photos_urls );
+                    }
+
+                } else {
+                    // User does not exist, create a new shop post
+                    $post_id = wp_insert_post( [
+                        'post_type'    => 'sync_shops',
+                        'post_title'   => $shop_name,
+                        'post_content' => $description,
+                        'post_status'  => 'publish',
+                    ] );
+
+                    // Add unique shop ID to post meta
+                    add_post_meta( $post_id, '_sync_shop_id', $shop_id, true );
+                }
+
+                // Serialize and store the shop data array as a single meta field
+                update_post_meta( $post_id, '_sync_shop_info', $meta_data );
+
+                // Set the photo URL as the featured image if available
+                if ( !empty( $photos_urls ) ) {
+                    $this->set_featured_image_from_url( $post_id, $photos_urls );
+                }
+
+                // Update shop status to 'completed' in the database
+                $wpdb->update(
+                    $table_name,
+                    [ 'status' => 'completed' ],
+                    [ 'id' => $shop->id ]
+                );
+            }
+
+            return 'Shop(s) processed successfully.';
+
+        } catch (\Exception $e) {
+            return new \WP_Error( 'exception', $e->getMessage(), [ 'status' => 500 ] );
+        }
     }
 
 }
