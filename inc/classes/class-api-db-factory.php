@@ -10,15 +10,24 @@ class API_DB_Factory {
     use Singleton;
     use Program_Logs;
 
+    private $api_base_url;
+    private $api_key;
+
     public function __construct() {
         $this->setup_hooks();
     }
 
     public function setup_hooks() {
-        // Register REST route for inserting users to database
         add_action( 'rest_api_init', [ $this, 'register_rest_route' ] );
         add_shortcode( 'helloagain_insert_users_db', [ $this, 'insert_user' ] );
         add_shortcode( 'helloagain_sync_users_api', [ $this, 'sync_users' ] );
+
+        $credentials_file = PLUGIN_BASE_PATH . '/credentials.json';
+        if ( file_exists( $credentials_file ) ) {
+            $credentials        = json_decode( file_get_contents( $credentials_file ), true );
+            $this->api_base_url = $credentials['api_base_url'];
+            $this->api_key      = $credentials['api_key'];
+        }
     }
 
     public function register_rest_route() {
@@ -32,6 +41,12 @@ class API_DB_Factory {
         register_rest_route( 'hello-again/v1', '/sync-users', [
             'methods'             => 'GET',
             'callback'            => [ $this, 'sync_users' ],
+            'permission_callback' => '__return_true',
+        ] );
+
+        register_rest_route( 'hello-again/v1', '/insert-shops', [
+            'methods'             => 'GET',
+            'callback'            => [ $this, 'insert_shops' ],
             'permission_callback' => '__return_true',
         ] );
     }
@@ -123,20 +138,9 @@ class API_DB_Factory {
 
     public function fetch_users_from_api( $page = 1 ) {
 
-        // Credentials
-        $api_base_url = '';
-        $api_key      = '';
-
-        $credentials_file = PLUGIN_BASE_PATH . '/credentials.json';
-        if ( file_exists( $credentials_file ) ) {
-            $credentials  = json_decode( file_get_contents( $credentials_file ), true );
-            $api_base_url = $credentials['api_base_url'];
-            $api_key      = $credentials['api_key'];
-        }
-
         $curl = curl_init();
         curl_setopt_array( $curl, array(
-            CURLOPT_URL            => $api_base_url . '/users/?limit=100&page=' . $page,
+            CURLOPT_URL            => $this->api_base_url . '/users/?limit=100&page=' . $page,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING       => '',
             CURLOPT_MAXREDIRS      => 10,
@@ -146,7 +150,7 @@ class API_DB_Factory {
             CURLOPT_CUSTOMREQUEST  => 'GET',
             CURLOPT_HTTPHEADER     => array(
                 'accept: application/json',
-                'Authorization: API-Key ' . $api_key,
+                'Authorization: API-Key ' . $this->api_key,
             ),
         ) );
 
@@ -336,6 +340,114 @@ class API_DB_Factory {
                 }
             }
         }
+    }
+
+    public function insert_shops() {
+        try {
+            // Fetch the first page to get total shops and pages.
+            $shops_json = $this->fetch_shops_from_api( 1 );
+
+            if ( empty( $shops_json ) ) {
+                return new \WP_Error( 'no_shops', 'No Shops found to insert', [ 'status' => 404 ] );
+            }
+
+            // Initialize variables
+            $total_shops      = 0;
+            $total_shop_pages = 0;
+
+            // Decode JSON
+            $shops_array = json_decode( $shops_json, true );
+
+            // Get total shops
+            if ( array_key_exists( 'count', $shops_array ) ) {
+                $total_shops = $shops_array['count'];
+            }
+
+            // Update total shops to options table
+            update_option( 'sync_total_shops', $total_shops );
+
+            // Calculate total pages
+            $total_shop_pages = ceil( $total_shops / 100 );
+
+            // Update total pages to options table
+            update_option( 'sync_total_shop_pages', $total_shop_pages );
+
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'sync_shops';
+
+            // Get the last processed page from options table or start from 1
+            $start_page = get_option( 'sync_current_shop_page', 1 );
+
+            // Loop through all pages starting from the last unprocessed page
+            for ( $page = $start_page; $page <= $total_shop_pages; $page++ ) {
+
+                // Fetch shops
+                $fetch_shops = $this->fetch_shops_from_api( $page );
+                // Decode JSON
+                $fetched_shop_array = json_decode( $fetch_shops, true );
+
+                // Update current page to options table
+                update_option( 'sync_current_shop_page', $page );
+
+                // Get shops on the current page
+                $shops = $fetched_shop_array['results'] ?? [];
+
+                foreach ( $shops as $shop ) {
+                    
+                    $shop_id   = $shop['id'];
+                    $shop_data = json_encode( $shop );
+                    $status    = 'pending';
+
+                    $sql = $wpdb->prepare(
+                        "INSERT INTO $table_name (shop_id, shop_data, status) VALUES (%s, %s, %s)
+                        ON DUPLICATE KEY UPDATE shop_data = %s, status = %s",
+                        $shop_id,
+                        $shop_data,
+                        $status,
+                        $shop_data,
+                        $status
+                    );
+
+                    $result = $wpdb->query( $sql );
+
+                    if ( $result === false ) {
+                        return new \WP_Error( 'db_error', 'Failed to insert or update shop in database', [ 'status' => 500 ] );
+                    }
+                }
+            }
+
+            // Reset current page after all pages have been processed
+            update_option( 'sync_current_shop_page', 1 );
+
+            return 'All Shops inserted or updated successfully.';
+
+        } catch (\Exception $e) {
+            return new \WP_Error( 'exception', $e->getMessage(), [ 'status' => 500 ] );
+        }
+    }
+
+    public function fetch_shops_from_api( $page = 1 ) {
+
+        $curl = curl_init();
+        curl_setopt_array( $curl, array(
+            CURLOPT_URL            => $this->api_base_url . '/shops/?page=' . $page . '&limit=100',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'GET',
+            CURLOPT_HTTPHEADER     => array(
+                'accept: application/json',
+                'Authorization: API-Key ' . $this->api_key,
+            ),
+        ) );
+
+        $response = curl_exec( $curl );
+
+        curl_close( $curl );
+        return $response;
     }
 
 }
