@@ -62,6 +62,8 @@ function wpb_plugin_activator() {
     require_once PLUGIN_BASE_PATH . '/inc/classes/class-plugin-activator.php';
     Plugin_Activator::activate();
     Plugin_Activator::create_user_page();
+    Plugin_Activator::create_shop_table();
+    Plugin_Activator::create_shop_page();
 }
 
 // Register activation hook
