@@ -6,11 +6,13 @@
 
 namespace BOILERPLATE\Inc;
 
+use BOILERPLATE\Inc\Traits\Program_Logs;
 use BOILERPLATE\Inc\Traits\Singleton;
 
 class Enqueue_Assets {
 
     use Singleton;
+    use Program_Logs;
 
     public function __construct() {
         $this->setup_hooks();
@@ -32,7 +34,7 @@ class Enqueue_Assets {
     public function enqueue_admin_assets( $page_now ) {
 
         // wp_enqueue_style( "wpb-bootstrap-admin", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/bootstrap.min.css", [], false, "all" );
-        // wp_enqueue_style( "wpb-admin-style", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/admin-style.css", [], false, "all" );
+        wp_enqueue_style( "wpb-admin-style", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/admin-style.css", [], false, "all" );
 
         /**
          * enqueue admin js
@@ -40,8 +42,10 @@ class Enqueue_Assets {
          * When you need to enqueue admin assets.
          * first check if the current page is you want to enqueue page
          */
-        if ( 'options-general.php' === $page_now ) {
-            wp_enqueue_script( "wpb-admin-js", PLUGIN_ADMIN_ASSETS_DIR_URL . "/js/admin-script.js", [ 'jquery' ], time(), true ); // replace time() to version number when in production
+
+        if ( 'settings_page_ha-settings-options' === $page_now ) {
+            wp_enqueue_script( "wpb-admin-js", PLUGIN_ADMIN_ASSETS_DIR_URL . "/js/admin-script.js", [ 'jquery' ], time(), true );
+            wp_localize_script( 'wpb-admin-js', 'haOptions', [ 'ajaxUrl' => admin_url( 'admin-ajax.php' ) ] );
         }
     }
 

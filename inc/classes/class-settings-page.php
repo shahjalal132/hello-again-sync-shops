@@ -16,6 +16,27 @@ class Settings_Page {
 
     public function setup_hooks() {
         add_action( 'admin_menu', [ $this, 'ha_options_page' ] );
+
+        add_action( 'wp_ajax_save_ha_options', [ $this, 'save_ha_options' ] );
+    }
+
+    // AJAX handler to save the options
+    public function save_ha_options() {
+        // Check if user has the right permissions
+        if ( !current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => 'Permission denied' ] );
+        }
+
+        // Sanitize and save the options
+        if ( isset( $_POST['api_base_url'] ) && isset( $_POST['api_key'] ) && isset( $_POST['how_many_posts_to_display'] ) ) {
+            update_option( 'api_base_url', sanitize_text_field( $_POST['api_base_url'] ) );
+            update_option( 'api_key', sanitize_text_field( $_POST['api_key'] ) );
+            update_option( 'how_many_posts_to_display', intval( $_POST['how_many_posts_to_display'] ) );
+
+            wp_send_json_success( [ 'message' => 'Settings saved successfully' ] );
+        } else {
+            wp_send_json_error( [ 'message' => 'Missing data' ] );
+        }
     }
 
     public function ha_options_page() {
