@@ -12,6 +12,7 @@ class API_DB_Factory {
 
     private $api_base_url;
     private $api_key;
+    private $item_to_display;
 
     public function __construct() {
         $this->setup_hooks();
@@ -29,12 +30,15 @@ class API_DB_Factory {
         add_shortcode( 'helloagain_sync_shops_api', [ $this, 'sync_shops' ] );
 
         // get credentials
-        $credentials_file = PLUGIN_BASE_PATH . '/credentials.json';
+        /* $credentials_file = PLUGIN_BASE_PATH . '/credentials.json';
         if ( file_exists( $credentials_file ) ) {
             $credentials        = json_decode( file_get_contents( $credentials_file ), true );
             $this->api_base_url = $credentials['api_base_url'];
             $this->api_key      = $credentials['api_key'];
-        }
+        } */
+
+        $this->api_base_url    = get_option( 'api_base_url' ) ?? '';
+        $this->api_key         = get_option( 'api_key' ) ?? '';
     }
 
     public function register_rest_route() {

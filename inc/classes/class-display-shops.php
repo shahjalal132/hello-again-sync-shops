@@ -10,6 +10,8 @@ class Display_Shops {
     use Singleton;
     use Program_Logs;
 
+    private $item_to_display;
+
     public function __construct() {
         $this->setup_hooks();
     }
@@ -20,6 +22,8 @@ class Display_Shops {
 
         add_action( 'wp_ajax_load_more_shops', [ $this, 'load_more_shops' ] );
         add_action( 'wp_ajax_nopriv_load_more_shops', [ $this, 'load_more_shops' ] );
+
+        $this->item_to_display = get_option( 'how_many_posts_to_display' ) ?? 9;
     }
 
     public function load_more_shops() {
@@ -28,7 +32,7 @@ class Display_Shops {
 
         $args = [
             'post_type'      => 'sync_shops',
-            'posts_per_page' => intval( $_POST['posts_per_page'] ),
+            'posts_per_page' => intval( $this->item_to_display ),
             'paged'          => $paged,
         ];
 
@@ -135,7 +139,7 @@ class Display_Shops {
 
                 $args = [
                     'post_type'      => 'sync_shops',
-                    'posts_per_page' => 9,
+                    'posts_per_page' => intval( $this->item_to_display ),
                 ];
 
                 $shops = new \WP_Query( $args );
@@ -167,7 +171,7 @@ class Display_Shops {
                             // Reverse the coordinates order to latitude, longitude
                             $coordinates = array_reverse( $coordinates );
                         }
-                        
+
                         $coordinates_string = implode( ',', $coordinates );
 
 

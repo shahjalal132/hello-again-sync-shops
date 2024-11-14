@@ -13,7 +13,7 @@
 }
 
 /* Wrapper styling for each section */
-.api-credentials, .ha-options {
+.api-credentials, .ha-options, .ha-endpoints {
   max-width: 600px;
   margin: 0 auto 2rem;
   padding: 2rem;
@@ -22,7 +22,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.api-credentials h4, .ha-options h4 {
+.api-credentials h4, .ha-options h4, .ha-endpoints h4 {
   font-size: 1.4rem;
   font-weight: 700;
   color: #333;

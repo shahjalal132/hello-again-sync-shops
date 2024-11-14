@@ -10,6 +10,8 @@ class Display_Users {
     use Singleton;
     use Program_Logs;
 
+    private $item_to_display;
+
     public function __construct() {
         $this->setup_hooks();
     }
@@ -19,6 +21,8 @@ class Display_Users {
 
         add_action( 'wp_ajax_load_more_users', [ $this, 'load_more_users' ] );
         add_action( 'wp_ajax_nopriv_load_more_users', [ $this, 'load_more_users' ] );
+
+        $this->item_to_display = get_option( 'how_many_posts_to_display' ) ?? 9;
     }
 
     public function load_more_users() {
@@ -27,7 +31,7 @@ class Display_Users {
 
         $args = [
             'post_type'      => 'sync_users',
-            'posts_per_page' => intval( $_POST['posts_per_page'] ),
+            'posts_per_page' => intval( $this->item_to_display ),
             'paged'          => $paged,
         ];
 
@@ -103,14 +107,14 @@ class Display_Users {
         ob_start();
         ?>
 
-        <div class="container">
+        <div class="container mt-5 mb-5">
             <div class="row g-4">
 
                 <?php
 
                 $args = [
                     'post_type'      => 'sync_users',
-                    'posts_per_page' => 9,
+                    'posts_per_page' => intval( $this->item_to_display ),
                 ];
 
                 $users = new \WP_Query( $args );

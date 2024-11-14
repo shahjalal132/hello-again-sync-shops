@@ -25,3 +25,16 @@
         <button type="button" id="save-btn">Save</button>
     </div>
 </div>
+
+<div class="ha-endpoints">
+    <h4 class="section-title">Endpoints</h4>
+    <?php
+    $site_url = site_url();
+    ?>
+
+    <p>Insert Users to Database: <?= $site_url . '/wp-json/hello-again/v1/insert-users' ?></p>
+    <p>Sync Users: <?= $site_url . '/wp-json/hello-again/v1/sync-users' ?></p>
+    <p>Insert Shops to Database: <?= $site_url . '/wp-json/hello-again/v1/insert-shops' ?></p>
+    <p>Sync Shops: <?= $site_url . '/wp-json/hello-again/v1/sync-shops' ?></p>
+
+</div>
