@@ -18,7 +18,7 @@ class Autoloader {
         Users_Post_Type::get_instance();
         API_DB_Factory::get_instance();
         Display_Users::get_instance();
-        Settings_Page::get_instance();
+        // Settings_Page::get_instance();
         Shops_Post_Type::get_instance();
     }
 }

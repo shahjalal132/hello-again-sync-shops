@@ -31,8 +31,8 @@ class Enqueue_Assets {
      */
     public function enqueue_admin_assets( $page_now ) {
 
-        wp_enqueue_style( "wpb-bootstrap-admin", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/bootstrap.min.css", [], false, "all" );
-        wp_enqueue_style( "wpb-admin-style", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/admin-style.css", [], false, "all" );
+        // wp_enqueue_style( "wpb-bootstrap-admin", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/bootstrap.min.css", [], false, "all" );
+        // wp_enqueue_style( "wpb-admin-style", PLUGIN_ADMIN_ASSETS_DIR_URL . "/css/admin-style.css", [], false, "all" );
 
         /**
          * enqueue admin js
