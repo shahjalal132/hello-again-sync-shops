@@ -18,12 +18,17 @@ class API_DB_Factory {
     }
 
     public function setup_hooks() {
+
+        // rest action
         add_action( 'rest_api_init', [ $this, 'register_rest_route' ] );
+
+        // shortcodes
         add_shortcode( 'helloagain_insert_users_db', [ $this, 'insert_user' ] );
         add_shortcode( 'helloagain_sync_users_api', [ $this, 'sync_users' ] );
         add_shortcode( 'helloagain_sync_shops_db', [ $this, 'insert_shops' ] );
         add_shortcode( 'helloagain_sync_shops_api', [ $this, 'sync_shops' ] );
 
+        // get credentials
         $credentials_file = PLUGIN_BASE_PATH . '/credentials.json';
         if ( file_exists( $credentials_file ) ) {
             $credentials        = json_decode( file_get_contents( $credentials_file ), true );
@@ -511,20 +516,20 @@ class API_DB_Factory {
 
                 $meta_data = [
                     '_fb_page_id  '            => $shop_data['fb_page_id'] ?? '',
-                    '_address'                 => $street,
+                    '_google_places_id'        => $shop_data['google_places_id'] ?? '',
+                    '_image_url'               => $shop_data['image_url'] ?? '',
+                    '_logo_url'                => $shop_data['logo_url'] ?? '',
+                    '_street'                  => $street,
                     '_city_code'               => $city_code,
                     '_city'                    => $city,
+                    '_email'                   => $shop_data['email'] ?? '',
                     '_phone_number'            => $shop_data['phone_number'] ?? '',
                     '_description'             => $description,
-                    '_email'                   => $shop_data['email'] ?? '',
                     '_certificate_common_name' => $shop_data['certificate_common_name'] ?? '',
                     '_category'                => $category,
-                    '_google_places_id'        => $shop_data['google_places_id'] ?? '',
                     '_client'                  => $client,
                     '_opening_hours'           => $opening_hours,
                     '_location'                => $location,
-                    '_image_url'               => $shop_data['image_url'] ?? '',
-                    '_logo_url'                => $shop_data['logo_url'] ?? '',
                 ];
 
                 // Check if user already exists in sync_shops post type by _sync_shop_id meta key

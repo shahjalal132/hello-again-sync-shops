@@ -14,3 +14,4 @@ include_once PLUGIN_BASE_PATH . '/inc/helpers/helper-functions.php';
 // include codestart framework
 include_once PLUGIN_BASE_PATH . '/inc/libs/codestar-framework/codestar-framework.php';
 include_once PLUGIN_BASE_PATH . '/inc/files/file-metabox.php';
+include_once PLUGIN_BASE_PATH . '/inc/files/file-sync-shop-metabox.php';

@@ -9,7 +9,6 @@ $prefix_page_opts = '_sync_users';
 CSF::createMetabox( $prefix_page_opts, array(
     'title'        => 'User Details',
     'post_type'    => 'sync_users',
-    'show_restore' => true,
 ) );
 
 // Create Section
