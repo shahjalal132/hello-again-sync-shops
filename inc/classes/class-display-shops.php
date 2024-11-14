@@ -57,6 +57,17 @@ class Display_Shops {
                 $_city_code = $shop_data['_city_code'] ?? '';
                 $_city      = $shop_data['_city'] ?? '';
 
+                $location    = $shop_data['_location'] ?? [];
+                $coordinates = $location['coordinates'] ?? [];
+
+                if ( count( $coordinates ) === 2 ) {
+                    // Reverse the coordinates order to latitude, longitude
+                    $coordinates = array_reverse( $coordinates );
+                }
+
+                $coordinates_string = implode( ',', $coordinates );
+
+
                 // Concatenate the address into a single variable
                 $address = $_street . "<br>" . $_city_code . "<br>" . $_city;
 
@@ -91,8 +102,8 @@ class Display_Shops {
                                 <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
                                     Website</a>
                             <?php endif; ?>
-                            <a href="https://maps.google.com/?q=<?php echo urlencode( strip_tags( $address ) ); ?>"
-                                class="link color-gold" target="_blank">Route in Google anzeigen</a>
+                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>" class="link color-gold"
+                                target="_blank">Route in Google anzeigen</a>
                         </div>
                     </div>
                 </div>
@@ -139,7 +150,6 @@ class Display_Shops {
         
                         // Get user data
                         $shop_data = get_post_meta( $post_id, '_sync_shop_info', true );
-
                         // $this->put_program_logs( json_encode( $shop_data ) );
         
                         $email   = $shop_data['_email'] ?? '';
@@ -149,6 +159,17 @@ class Display_Shops {
                         $_street    = $shop_data['_street'] ?? '';
                         $_city_code = $shop_data['_city_code'] ?? '';
                         $_city      = $shop_data['_city'] ?? '';
+
+                        $location    = $shop_data['_location'] ?? [];
+                        $coordinates = $location['coordinates'] ?? [];
+
+                        if ( count( $coordinates ) === 2 ) {
+                            // Reverse the coordinates order to latitude, longitude
+                            $coordinates = array_reverse( $coordinates );
+                        }
+                        
+                        $coordinates_string = implode( ',', $coordinates );
+
 
                         // Concatenate the address into a single variable
                         $address = $_street . "<br>" . $_city_code . "<br>" . $_city;
@@ -183,7 +204,7 @@ class Display_Shops {
                                         <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
                                             Website</a>
                                     <?php endif; ?>
-                                    <a href="https://maps.google.com/?q=<?php echo urlencode( strip_tags( $address ) ); ?>"
+                                    <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>"
                                         class="link color-gold" target="_blank">Route in Google anzeigen</a>
                                 </div>
                             </div>
