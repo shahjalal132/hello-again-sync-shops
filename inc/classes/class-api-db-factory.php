@@ -37,8 +37,8 @@ class API_DB_Factory {
             $this->api_key      = $credentials['api_key'];
         } */
 
-        $this->api_base_url    = get_option( 'api_base_url' ) ?? '';
-        $this->api_key         = get_option( 'api_key' ) ?? '';
+        $this->api_base_url = get_option( 'api_base_url' ) ?? '';
+        $this->api_key      = get_option( 'api_key' ) ?? '';
     }
 
     public function register_rest_route() {
@@ -329,8 +329,12 @@ class API_DB_Factory {
                 $image_name = basename( $image_url );
                 $upload_dir = wp_upload_dir();
 
-                // Download the image from URL
-                $image_data = file_get_contents( $image_url );
+                $image_data = false;
+
+                if ( !empty( $image_url ) ) {
+                    // Download the image from URL
+                    $image_data = file_get_contents( $image_url );
+                }
 
                 if ( $image_data !== false ) {
                     $image_file = $upload_dir['path'] . '/' . $image_name;
@@ -359,6 +363,8 @@ class API_DB_Factory {
                     set_post_thumbnail( $post_id, $attach_id );
 
                     break; // Exit the loop after setting the featured image
+                } else {
+                    return new \WP_Error( 'no_image_data', 'No image data found', [ 'status' => 404 ] );
                 }
             }
         }
