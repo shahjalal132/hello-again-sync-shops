@@ -15,9 +15,18 @@ class Settings_Page {
     }
 
     public function setup_hooks() {
+
         add_action( 'admin_menu', [ $this, 'ha_options_page' ] );
+        add_filter( 'plugin_action_links_' . PLUGIN_BASENAME, [ $this, 'add_plugin_action_links' ] );
 
         add_action( 'wp_ajax_save_ha_options', [ $this, 'save_ha_options' ] );
+    }
+
+    // Add settings link on the plugin page
+    function add_plugin_action_links( $links ) {
+        $settings_link = '<a href="admin.php?page=ha-settings-options">' . __( 'Settings', 'hello-again' ) . '</a>';
+        array_unshift( $links, $settings_link );
+        return $links;
     }
 
     // AJAX handler to save the options

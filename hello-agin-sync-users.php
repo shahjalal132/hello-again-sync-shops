@@ -20,6 +20,11 @@ if ( !defined( 'PLUGIN_BASE_PATH' ) ) {
     define( 'PLUGIN_BASE_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 }
 
+// Define plugin base path
+if ( !defined( 'PLUGIN_BASENAME' ) ) {
+    define( 'PLUGIN_BASENAME', untrailingslashit( plugin_basename( __FILE__ ) ) );
+}
+
 // Define plugin base url
 if ( !defined( 'PLUGIN_BASE_URL' ) ) {
     define( 'PLUGIN_BASE_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
