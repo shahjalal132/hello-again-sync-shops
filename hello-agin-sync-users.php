@@ -2,11 +2,11 @@
 
 /**
  *  
- * Plugin Name: Hello Again Sync Users
+ * Plugin Name: Hello Again Sync Shops
  * Plugin URI:  https://github.com/shahjalal132/hello-again-sync-users
  * Author:      Shah jalal
  * Author URI:  https://github.com/shahjalal132
- * Description: Sync users from Hello Again.
+ * Description: Sync shops from Hello Again.
  * Version:     1.0.0
  * text-domain: hello-again
  * Domain Path: /languages
