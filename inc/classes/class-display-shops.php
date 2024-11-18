@@ -34,6 +34,8 @@ class Display_Shops {
             'post_type'      => 'sync_shops',
             'posts_per_page' => intval( $this->item_to_display ),
             'paged'          => $paged,
+            'orderby'        => 'title',
+            'order'          => 'ASC',  
         ];
 
         $shops = new \WP_Query( $args );
@@ -140,6 +142,8 @@ class Display_Shops {
                 $args = [
                     'post_type'      => 'sync_shops',
                     'posts_per_page' => intval( $this->item_to_display ),
+                    'orderby'        => 'title',
+                    'order'          => 'ASC',
                 ];
 
                 $shops = new \WP_Query( $args );
