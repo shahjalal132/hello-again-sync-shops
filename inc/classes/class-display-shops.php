@@ -79,7 +79,7 @@ class Display_Shops {
                 ?>
 
                 <!-- Card -->
-                <div class="col-md-4" data-post-id="<?php echo esc_attr( $post_id ); ?>">
+                <div class="col-sm-6 col-md-6 col-lg-3" data-post-id="<?php echo esc_attr( $post_id ); ?>">
                     <div class="card h-100">
                         <div class="position-relative">
                             <!-- Dynamic featured image -->
@@ -181,7 +181,7 @@ class Display_Shops {
                         ?>
 
                         <!-- Card -->
-                        <div class="col-md-4" data-post-id="<?php echo esc_attr( $post_id ); ?>">
+                        <div class="col-sm-6 col-md-6 col-lg-3" data-post-id="<?php echo esc_attr( $post_id ); ?>">
                             <div class="card h-100">
                                 <div class="position-relative">
                                     <!-- Dynamic featured image -->

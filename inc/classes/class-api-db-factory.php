@@ -481,7 +481,7 @@ class API_DB_Factory {
     public function sync_shops() {
         try {
 
-            $limit = 1;
+            $limit = 5;
 
             // Fetch shops from the database
             global $wpdb;
@@ -571,9 +571,9 @@ class API_DB_Factory {
                     update_post_meta( $post_id, '_sync_shop_info', $meta_data );
 
                     // Set the photo URL as the featured image if available
-                    if ( !empty( $photos_urls ) ) {
+                    /* if ( !empty( $photos_urls ) ) {
                         $this->set_featured_image_from_url( $post_id, $photos_urls );
-                    }
+                    } */
 
                 } else {
                     // User does not exist, create a new shop post
