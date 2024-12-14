@@ -27,12 +27,19 @@
 .color-gold {
   color: #c3b197;
 }
-
+button#search-shops-button{
+  background-color: #fff !important;
+}
+#search-shops-input:focus{
+  border-color: #A50F19 !important;
+  box-shadow: none !important;
+}
+button#search-shops-button,
 button#btn-shop-load-more {
     color: #A50F19 !important;
     border-color: #A50F19 !important;
 }
-
+button#search-shops-button:hover,
 button#btn-shop-load-more:hover{
 	background-color: #A50F19 !important;
 	color: #fff !important;
