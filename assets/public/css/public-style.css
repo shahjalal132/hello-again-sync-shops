@@ -27,3 +27,13 @@
 .color-gold {
   color: #c3b197;
 }
+
+button#btn-shop-load-more {
+    color: #A50F19 !important;
+    border-color: #A50F19 !important;
+}
+
+button#btn-shop-load-more:hover{
+	background-color: #A50F19 !important;
+	color: #fff !important;
+}
