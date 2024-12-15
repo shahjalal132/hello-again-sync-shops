@@ -93,7 +93,7 @@
     searchInput.on('keyup', function () {
       let query = searchInput.val();
       shopPage = 1;
-      resultsContainer.html('<p>Loading...</p>');
+      resultsContainer.html('<p class="loader-container"><span class="loader"></span></p>');
       setTimeout(function (){
         $.ajax({
           url: load_more_params.ajax_url,

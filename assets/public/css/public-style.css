@@ -44,3 +44,30 @@ button#btn-shop-load-more:hover{
 	background-color: #A50F19 !important;
 	color: #fff !important;
 }
+
+.loader-container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 50vh !important;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #A50F19;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  }
+
+  @keyframes rotation {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+  } 
