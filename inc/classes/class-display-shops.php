@@ -344,8 +344,38 @@ class Display_Shops {
     
         <div class="container mt-5 mb-5">
             <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-3 order-1 order-lg-2">
+                    <!-- Search form -->
+                    <div class="category-filter mb-4">
+                        <label for="search-shops-input" class="form-label me-2">Suche Mitgliedsbetriebe:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="search-shops-input" placeholder="Suche Mitgliedsbetriebe">
+                            <button class="btn btn-primary" id="search-shops-button">Suche</button>
+                        </div>
+                    </div>
+                    <!-- Category Filter Dropdown -->
+                    <div class="category-filter mb-4">
+                        <label for="category-filter" class="form-label">Filter by Category:</label>
+                        <select id="category-filter" class="form-select">
+                            <option value="">All Categories</option>
+                            <?php
+                            $categories = get_terms( [
+                                'taxonomy'   => 'sync_shops_category', // Replace with your custom taxonomy
+                                'hide_empty' => false,
+                            ] );
+                            if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+                                foreach ( $categories as $category ) {
+                                    echo '<option value="' . esc_attr( $category->term_id ) . '">' . esc_html( $category->name ) . '</option>';
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                </div>
                 <!-- Main Content -->
-                <div class="col-lg-9">
+                <div class="col-lg-9 order-2 order-lg-1">
     
                     <div class="row g-4" id="shop-results">
                         <?php
@@ -426,37 +456,6 @@ class Display_Shops {
                     <div class="text-center">
                         <button type="button" class="btn btn-primary mt-3" id="btn-shop-load-more">Load More</button>
                     </div>
-                </div>
-    
-                <!-- Sidebar -->
-                <div class="col-lg-3">
-                    <!-- Search form -->
-                    <div class="category-filter mb-4">
-                        <label for="search-shops-input" class="form-label me-2">Search Shops:</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="search-shops-input" placeholder="Search shops">
-                            <button class="btn btn-primary" id="search-shops-button">Search</button>
-                        </div>
-                    </div>
-                    <!-- Category Filter Dropdown -->
-                    <div class="category-filter mb-4">
-                        <label for="category-filter" class="form-label">Filter by Category:</label>
-                        <select id="category-filter" class="form-select">
-                            <option value="">All Categories</option>
-                            <?php
-                            $categories = get_terms( [
-                                'taxonomy'   => 'sync_shops_category', // Replace with your custom taxonomy
-                                'hide_empty' => false,
-                            ] );
-                            if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
-                                foreach ( $categories as $category ) {
-                                    echo '<option value="' . esc_attr( $category->term_id ) . '">' . esc_html( $category->name ) . '</option>';
-                                }
-                            }
-                            ?>
-                        </select>
-                    </div>
-
                 </div>
             </div>
         </div>
