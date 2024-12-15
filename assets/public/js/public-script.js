@@ -45,7 +45,7 @@
           const data = JSON.parse(response);
 
           if (data.html) {
-            $(".container .row").append(data.html);
+            $(".container .row #shop-results").append(data.html);
             shopPage++;
           } else {
             $("#btn-shop-load-more").hide();
@@ -64,7 +64,7 @@
     $('#search-shops-button').on('click', function () {
       const query = searchInput.val(); // Get the search query
       shopPage = 1; // Reset page for fresh search results
-      resultsContainer.html('<p>Loading...</p>'); // Show loading text
+      resultsContainer.html('<p class="loader-container"><span class="loader"></span></p>'); // Show loading text
 
       $.ajax({
         url: load_more_params.ajax_url,
@@ -117,6 +117,37 @@
           },
         });
       }, 300);
+    });
+
+    // Category filter
+    $('#category-filter').on('change', function () {
+      const sync_shops_category = $(this).val(); // Get selected category ID
+      let shopPage = 1; // Reset pagination for fresh category results
+      const resultsContainer = $('#shop-results'); // Results container
+
+      resultsContainer.html('<p class="loader-container"><span class="loader"></span></p>'); // Show loading text
+
+      $.ajax({
+          url: load_more_params.ajax_url,
+          type: 'POST',
+          data: {
+              action: 'category_filter_shops',
+              sync_shops_category: sync_shops_category,
+              page: shopPage,
+          },
+          success: function (response) {
+              const data = JSON.parse(response);
+
+              if (data.html) {
+                  resultsContainer.html(data.html); // Display filtered results
+              } else {
+                  resultsContainer.html('<p>No results found for this category.</p>'); // No results
+              }
+          },
+          error: function () {
+              resultsContainer.html('<p>Error loading results.</p>'); // Error message
+          },
+      });
     });
 
   });
