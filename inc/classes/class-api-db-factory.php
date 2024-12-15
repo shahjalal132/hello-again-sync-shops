@@ -66,6 +66,12 @@ class API_DB_Factory {
             'callback'            => [ $this, 'sync_shops' ],
             'permission_callback' => '__return_true',
         ] );
+
+        register_rest_route( 'hello-again/v1', '/delete-all-media', [
+            'methods'             => 'GET',
+            'callback'            => [ $this, 'delete_all_media_items' ],
+            'permission_callback' => '__return_true',
+        ] );
     }
 
     public function insert_user() {
@@ -575,6 +581,15 @@ class API_DB_Factory {
                         $this->set_featured_image_from_url( $post_id, $photos_urls );
                     } */
 
+                    // Update shop status to 'completed' in the database
+                    $wpdb->update(
+                        $table_name,
+                        [ 'status' => 'completed' ],
+                        [ 'id' => $shop->id ]
+                    );
+
+                    return 'Shop(s) updated successfully.';
+
                 } else {
                     // User does not exist, create a new shop post
                     $post_id = wp_insert_post( [
@@ -586,28 +601,50 @@ class API_DB_Factory {
 
                     // Add unique shop ID to post meta
                     add_post_meta( $post_id, '_sync_shop_id', $shop_id, true );
+
+                    // Serialize and store the shop data array as a single meta field
+                    update_post_meta( $post_id, '_sync_shop_info', $meta_data );
+
+                    // Set the photo URL as the featured image if available
+                    if ( !empty( $photos_urls ) ) {
+                        $this->set_featured_image_from_url( $post_id, $photos_urls );
+                    }
+
+                    // Update shop status to 'completed' in the database
+                    $wpdb->update(
+                        $table_name,
+                        [ 'status' => 'completed' ],
+                        [ 'id' => $shop->id ]
+                    );
+
+                    return 'Shop(s) processed successfully.';
                 }
-
-                // Serialize and store the shop data array as a single meta field
-                update_post_meta( $post_id, '_sync_shop_info', $meta_data );
-
-                // Set the photo URL as the featured image if available
-                if ( !empty( $photos_urls ) ) {
-                    $this->set_featured_image_from_url( $post_id, $photos_urls );
-                }
-
-                // Update shop status to 'completed' in the database
-                $wpdb->update(
-                    $table_name,
-                    [ 'status' => 'completed' ],
-                    [ 'id' => $shop->id ]
-                );
             }
 
-            return 'Shop(s) processed successfully.';
 
         } catch (\Exception $e) {
             return new \WP_Error( 'exception', $e->getMessage(), [ 'status' => 500 ] );
+        }
+    }
+
+    public function delete_all_media_items() {
+        // Fetch all attachments (media items)
+        $args = [
+            'post_type'      => 'attachment',
+            'post_status'    => 'inherit',
+            'posts_per_page' => -1, // Fetch all items
+        ];
+    
+        $attachments = get_posts($args);
+    
+        if (!empty($attachments)) {
+            foreach ($attachments as $attachment) {
+                // Delete the attachment and its associated file
+                wp_delete_attachment($attachment->ID, true); // `true` ensures the file is also deleted
+            }
+            echo 'All media items have been deleted.';
+        } else {
+            echo 'No media items found.';
         }
     }
 
