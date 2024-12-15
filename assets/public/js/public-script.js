@@ -45,7 +45,7 @@
           const data = JSON.parse(response);
 
           if (data.html) {
-            $(".container .row").append(data.html);
+            $(".container .row #shop-results").append(data.html);
             shopPage++;
           } else {
             $("#btn-shop-load-more").hide();
