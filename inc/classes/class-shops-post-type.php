@@ -17,6 +17,9 @@ class Shops_Post_Type {
     public function setup_hooks() {
         add_action( 'init', [ $this, 'hea_shops_post_type' ], 0 );
         add_action( 'init', [ $this, 'add_category_taxonomy' ], 0 );
+        
+        // add sidebar
+        add_action( 'init', [ $this, 'boilerplate_register_sidebars' ] );
     }
 
     // Register Custom Post Type
@@ -78,6 +81,20 @@ class Shops_Post_Type {
     public function add_category_taxonomy() {
         register_taxonomy_for_object_type( 'category', 'sync_shops' );
 
+    }
+
+    public function boilerplate_register_sidebars() {
+        register_sidebar(
+            [
+                'name'          => __( 'Shop Sidebar', 'boilerplate' ),
+                'id'            => 'shop-sidebar',
+                'description'   => __( 'Sidebar for the shop pages.', 'boilerplate' ),
+                'before_widget' => '<div id="%1$s" class="widget %2$s">',
+                'after_widget'  => '</div>',
+                'before_title'  => '<h4 class="widget-title">',
+                'after_title'   => '</h4>',
+            ]
+        );
     }
 
 }

@@ -30,6 +30,10 @@
 button#search-shops-button{
   background-color: #fff !important;
 }
+.category-filter .form-label{
+  font-weight: 600;
+}
+#category-filter:focus,
 #search-shops-input:focus{
   border-color: #A50F19 !important;
   box-shadow: none !important;
