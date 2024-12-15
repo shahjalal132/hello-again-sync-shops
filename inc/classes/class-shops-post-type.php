@@ -16,6 +16,7 @@ class Shops_Post_Type {
 
     public function setup_hooks() {
         add_action( 'init', [ $this, 'hea_shops_post_type' ], 0 );
+        add_action( 'init', [ $this, 'add_category_taxonomy' ], 0 );
     }
 
     // Register Custom Post Type
@@ -73,4 +74,10 @@ class Shops_Post_Type {
         register_post_type( 'sync_shops', $args );
 
     }
+    // add Category taxonomy to post type
+    public function add_category_taxonomy() {
+        register_taxonomy_for_object_type( 'category', 'sync_shops' );
+
+    }
+
 }
