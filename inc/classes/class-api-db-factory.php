@@ -486,7 +486,6 @@ class API_DB_Factory {
 
     public function sync_shops() {
         try {
-
             $limit = 5;
 
             // Fetch shops from the database
@@ -500,17 +499,17 @@ class API_DB_Factory {
                 return new \WP_Error( 'no_pending_shops', 'No pending Shops found', [ 'status' => 404 ] );
             }
 
-            foreach ( $shops as $shop ) {
+            $return_messages = []; // Array to store messages for each shop
 
+            foreach ( $shops as $shop ) {
                 $shop_id   = $shop->shop_id;
                 $shop_data = json_decode( $shop->shop_data, true );
-                // $this->put_program_logs( 'Shop Data: ' . json_encode( $shop_data ) );
 
-                // retrieve shop data
+                // Retrieve shop data
                 $shop_name   = $shop_data['name'] ?? '';
                 $description = $shop_data['description'] ?? '';
 
-                // retrieve logo
+                // Retrieve logo
                 $logo        = $shop_data['logo'] ?? '';
                 $photos_urls = [
                     [
@@ -519,7 +518,7 @@ class API_DB_Factory {
                     ],
                 ];
 
-                // retrieve address
+                // Retrieve address
                 $address   = $shop_data['address'] ?? [];
                 $street    = $address['street'] ?? '';
                 $city_code = $address['city_code'] ?? '';
@@ -531,7 +530,7 @@ class API_DB_Factory {
                 $opening_hours = $shop_data['opening_hours'] ?? [];
 
                 $meta_data = [
-                    '_fb_page_id  '            => $shop_data['fb_page_id'] ?? '',
+                    '_fb_page_id'              => $shop_data['fb_page_id'] ?? '',
                     '_google_places_id'        => $shop_data['google_places_id'] ?? '',
                     '_image_url'               => $shop_data['image_url'] ?? '',
                     '_logo_url'                => $shop_data['logo_url'] ?? '',
@@ -561,7 +560,6 @@ class API_DB_Factory {
                     'fields'     => 'ids',
                 ] );
 
-                // Check if shop exists
                 if ( $existing_user_query->have_posts() ) {
                     // User exists, get the post ID and update
                     $post_id = $existing_user_query->posts[0];
@@ -573,13 +571,8 @@ class API_DB_Factory {
                         'post_content' => $description,
                     ] );
 
-                    // update shops meta data
+                    // Update shop meta data
                     update_post_meta( $post_id, '_sync_shop_info', $meta_data );
-
-                    // Set the photo URL as the featured image if available
-                    /* if ( !empty( $photos_urls ) ) {
-                        $this->set_featured_image_from_url( $post_id, $photos_urls );
-                    } */
 
                     // Update shop status to 'completed' in the database
                     $wpdb->update(
@@ -588,8 +581,7 @@ class API_DB_Factory {
                         [ 'id' => $shop->id ]
                     );
 
-                    return 'Shop(s) updated successfully.';
-
+                    $return_messages[] = "Shop (ID: {$shop->id}) updated successfully.";
                 } else {
                     // User does not exist, create a new shop post
                     $post_id = wp_insert_post( [
@@ -617,10 +609,12 @@ class API_DB_Factory {
                         [ 'id' => $shop->id ]
                     );
 
-                    return 'Shop(s) processed successfully.';
+                    $return_messages[] = "Shop (ID: {$shop->id}) created successfully.";
                 }
             }
 
+            // Combine and return all messages
+            return implode( "\n", $return_messages );
 
         } catch (\Exception $e) {
             return new \WP_Error( 'exception', $e->getMessage(), [ 'status' => 500 ] );
@@ -634,13 +628,13 @@ class API_DB_Factory {
             'post_status'    => 'inherit',
             'posts_per_page' => -1, // Fetch all items
         ];
-    
-        $attachments = get_posts($args);
-    
-        if (!empty($attachments)) {
-            foreach ($attachments as $attachment) {
+
+        $attachments = get_posts( $args );
+
+        if ( !empty( $attachments ) ) {
+            foreach ( $attachments as $attachment ) {
                 // Delete the attachment and its associated file
-                wp_delete_attachment($attachment->ID, true); // `true` ensures the file is also deleted
+                wp_delete_attachment( $attachment->ID, true ); // `true` ensures the file is also deleted
             }
             echo 'All media items have been deleted.';
         } else {
