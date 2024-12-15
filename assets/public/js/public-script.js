@@ -121,7 +121,7 @@
 
     // Category filter
     $('#category-filter').on('change', function () {
-      const category = $(this).val(); // Get selected category ID
+      const sync_shops_category = $(this).val(); // Get selected category ID
       let shopPage = 1; // Reset pagination for fresh category results
       const resultsContainer = $('#shop-results'); // Results container
 
@@ -132,7 +132,7 @@
           type: 'POST',
           data: {
               action: 'category_filter_shops',
-              category: category,
+              sync_shops_category: sync_shops_category,
               page: shopPage,
           },
           success: function (response) {

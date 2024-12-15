@@ -16,7 +16,7 @@ class Shops_Post_Type {
 
     public function setup_hooks() {
         add_action( 'init', [ $this, 'hea_shops_post_type' ], 0 );
-        add_action( 'init', [ $this, 'add_category_taxonomy' ], 0 );
+        add_action( 'init', [ $this, 'register_sync_shops_category' ], 0 );
         
         // add sidebar
         add_action( 'init', [ $this, 'boilerplate_register_sidebars' ] );
@@ -78,10 +78,34 @@ class Shops_Post_Type {
 
     }
     // add Category taxonomy to post type
-    public function add_category_taxonomy() {
-        register_taxonomy_for_object_type( 'category', 'sync_shops' );
+    public function register_sync_shops_category() {
+        $labels = [
+            'name'              => _x('Shop Categories', 'taxonomy general name', 'hello-again'),
+            'singular_name'     => _x('Shop Category', 'taxonomy singular name', 'hello-again'),
+            'search_items'      => __('Search Shop Categories', 'hello-again'),
+            'all_items'         => __('All Shop Categories', 'hello-again'),
+            'parent_item'       => __('Parent Shop Category', 'hello-again'),
+            'parent_item_colon' => __('Parent Shop Category:', 'hello-again'),
+            'edit_item'         => __('Edit Shop Category', 'hello-again'),
+            'update_item'       => __('Update Shop Category', 'hello-again'),
+            'add_new_item'      => __('Add New Shop Category', 'hello-again'),
+            'new_item_name'     => __('New Shop Category Name', 'hello-again'),
+            'menu_name'         => __('Shop Categories', 'hello-again'),
+        ];
 
+        $args = [
+            'hierarchical'      => true, // Set to false for non-hierarchical (tags-like behavior)
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => ['slug' => 'sync-shops-category'],
+        ];
+
+        register_taxonomy('sync_shops_category', ['sync_shops'], $args);
     }
+    
+    
 
     public function boilerplate_register_sidebars() {
         register_sidebar(

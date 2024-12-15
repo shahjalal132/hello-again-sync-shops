@@ -38,7 +38,7 @@ class Display_Shops {
 
     // Category filter function
     public function category_filter_shops() {
-        $category_id = isset( $_POST['category'] ) ? intval( $_POST['category'] ) : 0;
+        $category_id = isset( $_POST['sync_shops_category'] ) ? intval( $_POST['sync_shops_category'] ) : 0;
         $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
 
         $args = [
@@ -53,7 +53,7 @@ class Display_Shops {
         if ( $category_id ) {
             $args['tax_query'] = [
                 [
-                    'taxonomy' => 'category', // Replace with your custom taxonomy name
+                    'taxonomy' => 'sync_shops_category', // Replace with your custom taxonomy name
                     'field'    => 'term_id',
                     'terms'    => $category_id,
                 ],
@@ -445,7 +445,7 @@ class Display_Shops {
                             <option value="">All Categories</option>
                             <?php
                             $categories = get_terms( [
-                                'taxonomy'   => 'category', // Replace with your custom taxonomy
+                                'taxonomy'   => 'sync_shops_category', // Replace with your custom taxonomy
                                 'hide_empty' => false,
                             ] );
                             if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
