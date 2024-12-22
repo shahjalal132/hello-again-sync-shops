@@ -191,7 +191,7 @@ class Display_Users {
             </div>
 
             <div class="text-center">
-                <button type="button" class="btn btn-primary mt-3" id="btn-load-more">Load More</button>
+                <button type="button" class="btn btn-primary mt-3" id="btn-load-more">Mehr anzeigen</button>
             </div>
 
         </div>

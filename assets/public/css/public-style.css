@@ -38,6 +38,11 @@ button#search-shops-button{
   border-color: #A50F19 !important;
   box-shadow: none !important;
 }
+[type=button]:focus,
+button:focus {
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
 button#search-shops-button,
 button#btn-shop-load-more {
     color: #A50F19 !important;
