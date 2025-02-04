@@ -62,6 +62,9 @@ class Display_Shops {
 
         $shops = new \WP_Query( $args );
 
+        // get total posts count
+        $total_posts_count = $shops->found_posts;
+
         if ( $shops->have_posts() ) {
             ob_start();
 
@@ -112,6 +115,7 @@ class Display_Shops {
 
             $response = [
                 'html' => ob_get_clean(),
+                'post_count' => $total_posts_count
             ];
 
             echo json_encode( $response );
@@ -238,23 +242,73 @@ class Display_Shops {
     public function load_more_shops() {
 
         $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
-        // Check if the live search cookie is set
-        $live_search_query = isset( $_COOKIE['live_search_query'] ) ? sanitize_text_field( $_COOKIE['live_search_query'] ) : '';
 
-        $args = [
+        $cookie_key = 'live_search_query';
+        $search_string = '';
+        if ( isset( $_COOKIE[ $cookie_key ] ) ) {
+            $search_string = $_COOKIE[ $cookie_key ];
+        }
+
+        $category_search_cookie_key = 'live_search_category_query';
+        $category_search_string = null;
+        if ( isset( $_COOKIE[ $category_search_cookie_key ] ) ) {
+            $_category_search_string = $_COOKIE[ $category_search_cookie_key ];
+            $category_search_string = intval( $_category_search_string ); // Ensure it's an integer
+            $this->put_program_logs( 'Category search string: ' . $category_search_string );
+        }
+
+        // Prepare query for normal load more
+        $normal_args = [
             'post_type'      => 'sync_shops',
             'posts_per_page' => intval( $this->item_to_display ),
             'paged'          => $paged,
             'orderby'        => 'title',
-            'order'          => 'ASC',  
+            'order'          => 'ASC',
         ];
 
-        // If live search query is set, add it to the query
-        if ( ! empty( $live_search_query ) ) {
-            $args['s'] = $live_search_query;  // 's' is the parameter for the search query in WP_Query
+        // Prepare query for live search
+        $live_search_args = [
+            'post_type'      => 'sync_shops',
+            'posts_per_page' => intval( $this->item_to_display ),
+            'paged'          => $paged,
+            's'              => $search_string,
+            'orderby'        => 'title',
+            'order'          => 'ASC',
+        ];
+
+        // Prepare query for category search
+        if ( $category_search_string ) {
+            $category_search_args = [
+                'post_type'      => 'sync_shops',
+                'posts_per_page' => intval( $this->item_to_display ),
+                'paged'          => $paged,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+                'tax_query'      => [
+                    [
+                        'taxonomy' => 'sync_shops_category',
+                        'field'    => 'term_id',
+                        'terms'    => $category_search_string,
+                    ],
+                ],
+            ];
         }
 
+        // Determine which query args to use
+        if ( $category_search_string ) {
+            $args = $category_search_args;
+        } elseif ( $search_string ) {
+            $args = $live_search_args;
+        } else {
+            $args = $normal_args;
+        }
+
+        // Debugging (optional)
+        // $this->put_program_logs('load_more_shops args: ' . json_encode( $args ) );
+
+        // Get posts
         $shops = new \WP_Query( $args );
+
 
         // get total posts count
         $total_posts_count = $shops->found_posts;
@@ -378,9 +432,13 @@ class Display_Shops {
                             ] );
                             if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
                                 foreach ( $categories as $category ) {
-                                    echo '<option value="' . esc_attr( $category->term_id ) . '">' . esc_html( $category->name ) . '</option>';
+                                    $term_id = esc_attr( $category->term_id );
+                                    $name = esc_html( $category->name );
+                                    echo <<<EOD
+                                    <option value="{$term_id}">{$name}</option>
+                                    EOD;
                                 }
-                            }
+                            }                            
                             ?>
                         </select>
                     </div>

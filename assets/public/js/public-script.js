@@ -1,5 +1,11 @@
 (function ($) {
   $(document).ready(function () {
+    // remove cookies values
+    document.cookie =
+      "live_search_query=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "live_search_category_query=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
     // load more for user
     $("#btn-load-more").on("click", function () {
       $.ajax({
@@ -43,11 +49,15 @@
         success: function (response) {
           const data = JSON.parse(response);
 
+          if (data.post_count < load_more_params.posts_per_page) {
+            $("#btn-shop-load-more").hide();
+          } else {
+            $("#btn-shop-load-more").show();
+          }
+
           if (data.html) {
             $(".container .row #shop-results").append(data.html);
             shopPage++;
-          } else {
-            $("#btn-shop-load-more").hide();
           }
         },
         error: function (xhr, status, error) {
@@ -102,7 +112,7 @@
 
       // set cookie for live search in one minute
       let expirationTime = new Date();
-      expirationTime.setMinutes(expirationTime.getMinutes() + 1);
+      expirationTime.setMinutes(expirationTime.getMinutes() + 10);
       document.cookie = `live_search_query=${query}; expires=${expirationTime.toUTCString()}; path=/`;
 
       shopPage = 1;
@@ -143,6 +153,12 @@
     // Category filter
     $("#category-filter").on("change", function () {
       const sync_shops_category = $(this).val(); // Get selected category ID
+
+      // set cookie for live search in one minute
+      let expirationTime = new Date();
+      expirationTime.setMinutes(expirationTime.getMinutes() + 5);
+      document.cookie = `live_search_category_query=${sync_shops_category}; expires=${expirationTime.toUTCString()}; path=/`;
+
       let shopPage = 1; // Reset pagination for fresh category results
       const resultsContainer = $("#shop-results"); // Results container
 
@@ -160,6 +176,14 @@
         },
         success: function (response) {
           const data = JSON.parse(response);
+
+          console.log("category count: ", data.post_count);
+
+          if (data.post_count < load_more_params.posts_per_page) {
+            $("#btn-shop-load-more").hide();
+          } else {
+            $("#btn-shop-load-more").show();
+          }
 
           if (data.html) {
             resultsContainer.html(data.html); // Display filtered results
