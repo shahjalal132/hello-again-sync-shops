@@ -92,6 +92,12 @@
     // live search for shops
     searchInput.on('keyup', function () {
       let query = searchInput.val();
+
+      // set cookie for live search in one minute
+      let expirationTime = new Date();
+      expirationTime.setMinutes(expirationTime.getMinutes() + 1); 
+      document.cookie = `live_search_query=${query}; expires=${expirationTime.toUTCString()}; path=/`;
+
       shopPage = 1;
       resultsContainer.html('<p class="loader-container"><span class="loader"></span></p>');
       setTimeout(function (){

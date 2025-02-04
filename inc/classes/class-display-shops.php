@@ -129,6 +129,7 @@ class Display_Shops {
         $search_query = isset( $_POST['query'] ) ? sanitize_text_field( $_POST['query'] ) : '';
     
         $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
+        
     
         // Log the search query for debugging
         error_log('Search query: ' . $search_query);
@@ -237,6 +238,8 @@ class Display_Shops {
     public function load_more_shops() {
 
         $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
+        // Check if the live search cookie is set
+        $live_search_query = isset( $_COOKIE['live_search_query'] ) ? sanitize_text_field( $_COOKIE['live_search_query'] ) : '';
 
         $args = [
             'post_type'      => 'sync_shops',
@@ -245,6 +248,11 @@ class Display_Shops {
             'orderby'        => 'title',
             'order'          => 'ASC',  
         ];
+
+        // If live search query is set, add it to the query
+        if ( ! empty( $live_search_query ) ) {
+            $args['s'] = $live_search_query;  // 's' is the parameter for the search query in WP_Query
+        }
 
         $shops = new \WP_Query( $args );
 
@@ -452,7 +460,6 @@ class Display_Shops {
                         wp_reset_postdata();
                         ?>
                     </div>
-    
                     <div class="text-center">
                         <button type="button" class="btn btn-primary mt-3" id="btn-shop-load-more">Mehr anzeigen</button>
                     </div>
