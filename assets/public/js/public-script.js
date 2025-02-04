@@ -1,6 +1,5 @@
 (function ($) {
   $(document).ready(function () {
-
     // load more for user
     $("#btn-load-more").on("click", function () {
       $.ajax({
@@ -58,103 +57,120 @@
     });
 
     // Search Shops
-    const searchInput = $('#search-shops-input'); // Input field for search
-    const resultsContainer = $('#shop-results'); // Where results will be displayed
+    const searchInput = $("#search-shops-input"); // Input field for search
+    const resultsContainer = $("#shop-results"); // Where results will be displayed
 
-    $('#search-shops-button').on('click', function () {
+    $("#search-shops-button").on("click", function () {
       const query = searchInput.val(); // Get the search query
       shopPage = 1; // Reset page for fresh search results
-      resultsContainer.html('<p class="loader-container"><span class="loader"></span></p>'); // Show loading text
+      resultsContainer.html(
+        '<p class="loader-container"><span class="loader"></span></p>'
+      ); // Show loading text
 
       $.ajax({
         url: load_more_params.ajax_url,
-        type: 'POST',
+        type: "POST",
         data: {
-          action: 'search_shops',
-          query: query,  // Use 'query' here instead of 'search_query'
+          action: "search_shops",
+          query: query, // Use 'query' here instead of 'search_query'
           page: shopPage,
         },
         success: function (response) {
           const data = JSON.parse(response);
 
+          if (data.post_count < load_more_params.posts_per_page) {
+            $("#btn-shop-load-more").hide();
+          } else {
+            $("#btn-shop-load-more").show();
+          }
+
           if (data.html) {
             resultsContainer.html(data.html); // Display results
           } else {
-            resultsContainer.html('<p>No results found.</p>'); // No results
+            resultsContainer.html("<p>No results found.</p>"); // No results
           }
         },
         error: function () {
-          resultsContainer.html('<p>Error loading results.</p>');
+          resultsContainer.html("<p>Error loading results.</p>");
         },
       });
     });
 
     // live search for shops
-    searchInput.on('keyup', function () {
+    searchInput.on("keyup", function () {
       let query = searchInput.val();
 
       // set cookie for live search in one minute
       let expirationTime = new Date();
-      expirationTime.setMinutes(expirationTime.getMinutes() + 1); 
+      expirationTime.setMinutes(expirationTime.getMinutes() + 1);
       document.cookie = `live_search_query=${query}; expires=${expirationTime.toUTCString()}; path=/`;
 
       shopPage = 1;
-      resultsContainer.html('<p class="loader-container"><span class="loader"></span></p>');
-      setTimeout(function (){
+      resultsContainer.html(
+        '<p class="loader-container"><span class="loader"></span></p>'
+      );
+      setTimeout(function () {
         $.ajax({
           url: load_more_params.ajax_url,
-          type: 'POST',
+          type: "POST",
           data: {
-            action: 'live_search_shops',
-            query: query,  // Use 'query' here instead of 'search_query'
+            action: "live_search_shops",
+            query: query, // Use 'query' here instead of 'search_query'
             page: shopPage,
           },
           success: function (response) {
             const data = JSON.parse(response);
-  
+
+            if (data.post_count < load_more_params.posts_per_page) {
+              $("#btn-shop-load-more").hide();
+            } else {
+              $("#btn-shop-load-more").show();
+            }
+
             if (data.html) {
               resultsContainer.html(data.html); // Display results
             } else {
-              resultsContainer.html('<p>No results found.</p>'); // No results
+              resultsContainer.html("<p>No results found.</p>"); // No results
             }
           },
           error: function () {
-            resultsContainer.html('<p>Error loading results.</p>');
+            resultsContainer.html("<p>Error loading results.</p>");
           },
         });
       }, 300);
     });
 
     // Category filter
-    $('#category-filter').on('change', function () {
+    $("#category-filter").on("change", function () {
       const sync_shops_category = $(this).val(); // Get selected category ID
       let shopPage = 1; // Reset pagination for fresh category results
-      const resultsContainer = $('#shop-results'); // Results container
+      const resultsContainer = $("#shop-results"); // Results container
 
-      resultsContainer.html('<p class="loader-container"><span class="loader"></span></p>'); // Show loading text
+      resultsContainer.html(
+        '<p class="loader-container"><span class="loader"></span></p>'
+      ); // Show loading text
 
       $.ajax({
-          url: load_more_params.ajax_url,
-          type: 'POST',
-          data: {
-              action: 'category_filter_shops',
-              sync_shops_category: sync_shops_category,
-              page: shopPage,
-          },
-          success: function (response) {
-              const data = JSON.parse(response);
+        url: load_more_params.ajax_url,
+        type: "POST",
+        data: {
+          action: "category_filter_shops",
+          sync_shops_category: sync_shops_category,
+          page: shopPage,
+        },
+        success: function (response) {
+          const data = JSON.parse(response);
 
-              if (data.html) {
-                  resultsContainer.html(data.html); // Display filtered results
-              } else {
-                  resultsContainer.html('<p>No results found for this category.</p>'); // No results
-              }
-          },
-          error: function () {
-              resultsContainer.html('<p>Error loading results.</p>'); // Error message
-          },
+          if (data.html) {
+            resultsContainer.html(data.html); // Display filtered results
+          } else {
+            resultsContainer.html("<p>No results found for this category.</p>"); // No results
+          }
+        },
+        error: function () {
+          resultsContainer.html("<p>Error loading results.</p>"); // Error message
+        },
       });
     });
-
   });
 })(jQuery);

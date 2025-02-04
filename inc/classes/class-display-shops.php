@@ -129,11 +129,7 @@ class Display_Shops {
         $search_query = isset( $_POST['query'] ) ? sanitize_text_field( $_POST['query'] ) : '';
     
         $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
-        
-    
-        // Log the search query for debugging
-        error_log('Search query: ' . $search_query);
-    
+            
         $args = [
             'post_type'      => 'sync_shops',
             'posts_per_page' => intval( $this->item_to_display ),
@@ -144,7 +140,10 @@ class Display_Shops {
         ];
     
         $shops = new \WP_Query( $args );
-    
+
+        // get total posts count
+        $total_posts_count = $shops->found_posts;
+        
         if ( $shops->have_posts() ) {
             ob_start();
     
@@ -224,6 +223,7 @@ class Display_Shops {
     
             $response = [
                 'html' => ob_get_clean(),
+                'post_count' => $total_posts_count,
             ];
     
             echo json_encode( $response );
@@ -255,6 +255,9 @@ class Display_Shops {
         }
 
         $shops = new \WP_Query( $args );
+
+        // get total posts count
+        $total_posts_count = $shops->found_posts;
 
         if ( $shops->have_posts() ) {
             ob_start();
@@ -336,11 +339,12 @@ class Display_Shops {
 
             $response = [
                 'html' => ob_get_clean(),
+                'post_count' => $total_posts_count
             ];
 
             echo json_encode( $response );
         } else {
-            echo json_encode( [ 'html' => '' ] );
+            echo json_encode( [ 'html' => '', 'post_count' => 0 ] );
         }
 
         wp_die();
