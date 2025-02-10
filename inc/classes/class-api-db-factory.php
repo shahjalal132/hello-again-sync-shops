@@ -518,6 +518,11 @@ class API_DB_Factory {
                     ],
                 ];
 
+                $email = $shop_data['email'];
+                // extract website from email
+                $email_parts = explode( '@', $email );
+                $website     = 'https://www.' . $email_parts[1];
+
                 // Retrieve address
                 $address   = $shop_data['address'] ?? [];
                 $street    = $address['street'] ?? '';
@@ -537,7 +542,8 @@ class API_DB_Factory {
                     '_street'                  => $street,
                     '_city_code'               => $city_code,
                     '_city'                    => $city,
-                    '_email'                   => $shop_data['email'] ?? '',
+                    '_email'                   => $email ?? '',
+                    '_website'                 => $website ?? '',
                     '_phone_number'            => $shop_data['phone_number'] ?? '',
                     '_description'             => $description,
                     '_certificate_common_name' => $shop_data['certificate_common_name'] ?? '',

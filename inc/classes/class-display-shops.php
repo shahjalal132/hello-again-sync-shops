@@ -73,7 +73,7 @@ class Display_Shops {
 
                 $post_id        = get_the_ID();
                 $title          = get_the_title();
-                $featured_image = get_the_post_thumbnail_url( $post_id, 'medium' ) ?: 'https://placehold.jp/150x150.png';
+                $featured_image = get_the_post_thumbnail_url( $post_id, 'medium' ) ?: 'https://placehold.jp/150x150.png';   
                 $shop_data      = get_post_meta( $post_id, '_sync_shop_info', true );
 
                 $email   = $shop_data['_email'] ?? '';
@@ -81,6 +81,16 @@ class Display_Shops {
                 $website = $shop_data['_website'] ?? '';
                 $_street = $shop_data['_street'] ?? '';
                 $_city   = $shop_data['_city'] ?? '';
+
+                $location    = $shop_data['_location'] ?? [];
+                $coordinates = $location['coordinates'] ?? [];
+
+                if ( count( $coordinates ) === 2 ) {
+                    // Reverse the coordinates order to latitude, longitude
+                    $coordinates = array_reverse( $coordinates );
+                }
+
+                $coordinates_string = implode( ',', $coordinates );
 
                 $address = $_street . "<br>" . $_city;
 
@@ -103,8 +113,11 @@ class Display_Shops {
                                 <?php endif; ?>
                             </p>
                             <?php if ( $website ) : ?>
-                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">Visit Website</a>
+                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
+                                    Website</a>
                             <?php endif; ?>
+                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>"
+                                class="link color-gold" target="_blank">Route in Google anzeigen</a>
                         </div>
                     </div>
                 </div>
@@ -508,9 +521,10 @@ class Display_Shops {
                                                 <?php endif; ?>
                                             </p>
                                             <?php if ( $website ) : ?>
-                                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">Visit Website</a>
+                                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur Website</a>
                                             <?php endif; ?>
-                                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>" class="link color-gold" target="_blank">View on Google Maps</a>
+                                            <br>
+                                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>" class="link color-gold" target="_blank">Route in Google anzeigen</a>
                                         </div>
                                     </div>
                                 </div>
