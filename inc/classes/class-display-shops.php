@@ -39,7 +39,7 @@ class Display_Shops {
     // Category filter function
     public function category_filter_shops() {
         $category_id = isset( $_POST['sync_shops_category'] ) ? intval( $_POST['sync_shops_category'] ) : 0;
-        $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
+        $paged       = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
 
         $args = [
             'post_type'      => 'sync_shops',
@@ -73,7 +73,7 @@ class Display_Shops {
 
                 $post_id        = get_the_ID();
                 $title          = get_the_title();
-                $featured_image = get_the_post_thumbnail_url( $post_id, 'medium' ) ?: 'https://placehold.jp/150x150.png';   
+                $featured_image = get_the_post_thumbnail_url( $post_id, 'medium' ) ?: 'https://placehold.jp/150x150.png';
                 $shop_data      = get_post_meta( $post_id, '_sync_shop_info', true );
 
                 $email   = $shop_data['_email'] ?? '';
@@ -99,25 +99,40 @@ class Display_Shops {
                 <div class="col-sm-6 col-md-6 col-lg-4" data-post-id="<?php echo esc_attr( $post_id ); ?>">
                     <div class="card h-100">
                         <div class="position-relative">
-                            <img src="<?php echo esc_url( $featured_image ); ?>" class="card-img-top" alt="<?php echo esc_attr( $title ); ?>">
+                            <img src="<?php echo esc_url( $featured_image ); ?>" class="card-img-top"
+                                alt="<?php echo esc_attr( $title ); ?>">
                         </div>
                         <div class="card-body">
                             <h5 class="card-title"><?php echo esc_html( $title ); ?></h5>
                             <p class="card-text">
                                 <?php echo wp_kses_post( nl2br( $address ) ); ?><br>
                                 <?php if ( $email ) : ?>
-                                    <a href="mailto:<?php echo esc_attr( $email ); ?>" class="color-gold"><?php echo esc_html( $email ); ?></a><br>
+                                    <a href="mailto:<?php echo esc_attr( $email ); ?>"
+                                        class="color-gold"><?php echo esc_html( $email ); ?></a><br>
                                 <?php endif; ?>
                                 <?php if ( $phone ) : ?>
                                     <a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a>
                                 <?php endif; ?>
                             </p>
-                            <?php if ( $website ) : ?>
-                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
-                                    Website</a>
-                            <?php endif; ?>
-                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>"
-                                class="link color-gold" target="_blank">Route in Google anzeigen</a>
+                            <?php
+                            if ( $email ) {
+                                $email_parts = explode( '@', $email );
+                                if ( isset( $email_parts[1] ) ) {
+                                    $email_domain    = strtolower( $email_parts[1] );
+                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
+            
+                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                        ?>
+                                        <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
+                                            Website</a>
+                                        <?php
+                                    }
+                                }
+                            }
+                            ?>
+                            <br>
+                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>" class="link color-gold"
+                                target="_blank">Route in Google anzeigen</a>
                         </div>
                     </div>
                 </div>
@@ -127,8 +142,8 @@ class Display_Shops {
             wp_reset_postdata();
 
             $response = [
-                'html' => ob_get_clean(),
-                'post_count' => $total_posts_count
+                'html'       => ob_get_clean(),
+                'post_count' => $total_posts_count,
             ];
 
             echo json_encode( $response );
@@ -144,9 +159,9 @@ class Display_Shops {
     public function search_shops() {
         // Use 'query' instead of 'search_query'
         $search_query = isset( $_POST['query'] ) ? sanitize_text_field( $_POST['query'] ) : '';
-    
+
         $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
-            
+
         $args = [
             'post_type'      => 'sync_shops',
             'posts_per_page' => intval( $this->item_to_display ),
@@ -155,15 +170,15 @@ class Display_Shops {
             'orderby'        => 'title',
             'order'          => 'ASC',
         ];
-    
+
         $shops = new \WP_Query( $args );
 
         // get total posts count
         $total_posts_count = $shops->found_posts;
-        
+
         if ( $shops->have_posts() ) {
             ob_start();
-    
+
             while ( $shops->have_posts() ) {
                 $shops->the_post();
 
@@ -223,50 +238,63 @@ class Display_Shops {
                                     <a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a>
                                 <?php endif; ?>
                             </p>
-                            <?php if ( $website ) : ?>
-                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
-                                    Website</a>
-                            <?php endif; ?>
-                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>"
-                                class="link color-gold" target="_blank">Route in Google anzeigen</a>
+                            <?php
+                            if ( $email ) {
+                                $email_parts = explode( '@', $email );
+                                if ( isset( $email_parts[1] ) ) {
+                                    $email_domain    = strtolower( $email_parts[1] );
+                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
+            
+                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                        ?>
+                                        <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
+                                            Website</a>
+                                        <?php
+                                    }
+                                }
+                            }
+                            ?>
+                            <br>
+                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>" class="link color-gold"
+                                target="_blank">Route in Google anzeigen</a>
                         </div>
                     </div>
                 </div>
 
                 <?php
             }
-    
+
             wp_reset_postdata();
-    
+
             $response = [
-                'html' => ob_get_clean(),
+                'html'       => ob_get_clean(),
                 'post_count' => $total_posts_count,
             ];
-    
+
             echo json_encode( $response );
         } else {
             echo json_encode( [ 'html' => '<p>No results found.</p>' ] );
         }
-    
+
         wp_die();
     }
-    
+
 
     public function load_more_shops() {
 
         $paged = isset( $_POST['page'] ) ? intval( $_POST['page'] ) : 1;
 
-        $cookie_key = 'live_search_query';
+        $cookie_key    = 'live_search_query';
         $search_string = '';
-        if ( isset( $_COOKIE[ $cookie_key ] ) ) {
-            $search_string = $_COOKIE[ $cookie_key ];
+        if ( isset( $_COOKIE[$cookie_key] ) ) {
+            $search_string = $_COOKIE[$cookie_key];
         }
 
         $category_search_cookie_key = 'live_search_category_query';
-        $category_search_string = null;
-        if ( isset( $_COOKIE[ $category_search_cookie_key ] ) ) {
-            $_category_search_string = $_COOKIE[ $category_search_cookie_key ];
-            $category_search_string = intval( $_category_search_string ); // Ensure it's an integer
+        $category_search_string     = null;
+        if ( isset( $_COOKIE[$category_search_cookie_key] ) ) {
+            $_category_search_string = $_COOKIE[$category_search_cookie_key];
+            $category_search_string  = intval( $_category_search_string ); // Ensure it's an integer
             $this->put_program_logs( 'Category search string: ' . $category_search_string );
         }
 
@@ -359,7 +387,6 @@ class Display_Shops {
 
                 $coordinates_string = implode( ',', $coordinates );
 
-
                 // Concatenate the address into a single variable
                 $address = $_street . "<br>" . $_city_code . "<br>" . $_city;
 
@@ -390,10 +417,23 @@ class Display_Shops {
                                     <a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a>
                                 <?php endif; ?>
                             </p>
-                            <?php if ( $website ) : ?>
-                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
-                                    Website</a>
-                            <?php endif; ?>
+                            <?php
+                            if ( $email ) {
+                                $email_parts = explode( '@', $email );
+                                if ( isset( $email_parts[1] ) ) {
+                                    $email_domain    = strtolower( $email_parts[1] );
+                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
+            
+                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                        ?>
+                                        <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
+                                            Website</a>
+                                        <?php
+                                    }
+                                }
+                            }
+                            ?>
+                            <br>
                             <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>" class="link color-gold"
                                 target="_blank">Route in Google anzeigen</a>
                         </div>
@@ -405,8 +445,8 @@ class Display_Shops {
             wp_reset_postdata();
 
             $response = [
-                'html' => ob_get_clean(),
-                'post_count' => $total_posts_count
+                'html'       => ob_get_clean(),
+                'post_count' => $total_posts_count,
             ];
 
             echo json_encode( $response );
@@ -420,7 +460,7 @@ class Display_Shops {
     public function display_shops_html() {
         ob_start();
         ?>
-    
+
         <div class="container mt-5 mb-5">
             <div class="row">
                 <!-- Sidebar -->
@@ -429,7 +469,8 @@ class Display_Shops {
                     <div class="category-filter mb-4">
                         <label for="search-shops-input" class="form-label me-2">Suche Mitgliedsbetriebe:</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="search-shops-input" placeholder="Suche Mitgliedsbetriebe">
+                            <input type="text" class="form-control" id="search-shops-input"
+                                placeholder="Suche Mitgliedsbetriebe">
                             <button class="btn btn-primary" id="search-shops-button">Suche</button>
                         </div>
                     </div>
@@ -443,15 +484,15 @@ class Display_Shops {
                                 'taxonomy'   => 'sync_shops_category', // Replace with your custom taxonomy
                                 'hide_empty' => false,
                             ] );
-                            if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+                            if ( !empty( $categories ) && !is_wp_error( $categories ) ) {
                                 foreach ( $categories as $category ) {
                                     $term_id = esc_attr( $category->term_id );
-                                    $name = esc_html( $category->name );
+                                    $name    = esc_html( $category->name );
                                     echo <<<EOD
                                     <option value="{$term_id}">{$name}</option>
                                     EOD;
                                 }
-                            }                            
+                            }
                             ?>
                         </select>
                     </div>
@@ -459,7 +500,7 @@ class Display_Shops {
                 </div>
                 <!-- Main Content -->
                 <div class="col-lg-9 order-2 order-lg-1">
-    
+
                     <div class="row g-4" id="shop-results">
                         <?php
                         $args = [
@@ -468,40 +509,40 @@ class Display_Shops {
                             'orderby'        => 'title',
                             'order'          => 'ASC',
                         ];
-    
+
                         $shops = new \WP_Query( $args );
-    
+
                         if ( $shops->have_posts() ) {
                             while ( $shops->have_posts() ) {
                                 $shops->the_post();
-    
+
                                 $post_id        = get_the_ID();
                                 $title          = get_the_title();
                                 $featured_image = get_the_post_thumbnail_url( get_the_ID(), 'medium' ) ?: 'https://placehold.jp/150x150.png';
-    
+
                                 $shop_data = get_post_meta( $post_id, '_sync_shop_info', true );
-    
+
                                 $email   = $shop_data['_email'] ?? '';
                                 $phone   = $shop_data['_phone_number'] ?? '';
                                 $website = $shop_data['_website'] ?? '';
-    
+
                                 $_street    = $shop_data['_street'] ?? '';
                                 $_city_code = $shop_data['_city_code'] ?? '';
                                 $_city      = $shop_data['_city'] ?? '';
-    
+
                                 $location    = $shop_data['_location'] ?? [];
                                 $coordinates = $location['coordinates'] ?? [];
-    
+
                                 if ( count( $coordinates ) === 2 ) {
                                     $coordinates = array_reverse( $coordinates );
                                 }
-    
+
                                 $coordinates_string = implode( ',', $coordinates );
-    
+
                                 $address = $_street . "<br>" . $_city_code . "<br>" . $_city;
-    
+
                                 ?>
-    
+
                                 <!-- Card -->
                                 <div class="col-sm-6 col-md-6 col-lg-4" data-post-id="<?php echo esc_attr( $post_id ); ?>">
                                     <div class="card h-100">
@@ -514,25 +555,40 @@ class Display_Shops {
                                             <p class="card-text mb-0">
                                                 <?php echo wp_kses_post( nl2br( $address ) ); ?><br>
                                                 <?php if ( $email ) : ?>
-                                                    <a href="mailto:<?php echo esc_attr( $email ); ?>" class="color-gold"><?php echo esc_html( $email ); ?></a><br>
+                                                    <a href="mailto:<?php echo esc_attr( $email ); ?>"
+                                                        class="color-gold"><?php echo esc_html( $email ); ?></a><br>
                                                 <?php endif; ?>
                                                 <?php if ( $phone ) : ?>
                                                     <a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a>
                                                 <?php endif; ?>
                                             </p>
-                                            <?php if ( $website ) : ?>
-                                                <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur Website</a>
-                                            <?php endif; ?>
+                                            <?php
+                                            if ( $email ) {
+                                                $email_parts = explode( '@', $email );
+                                                if ( isset( $email_parts[1] ) ) {
+                                                    $email_domain    = strtolower( $email_parts[1] );
+                                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
+                            
+                                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                                        ?>
+                                                        <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
+                                                            Website</a>
+                                                        <?php
+                                                    }
+                                                }
+                                            }
+                                            ?>
                                             <br>
-                                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>" class="link color-gold" target="_blank">Route in Google anzeigen</a>
+                                            <a href="https://maps.google.com/?q=<?php echo esc_attr( $coordinates_string ); ?>"
+                                                class="link color-gold" target="_blank">Route in Google anzeigen</a>
                                         </div>
                                     </div>
                                 </div>
-    
+
                                 <?php
                             }
                         }
-    
+
                         wp_reset_postdata();
                         ?>
                     </div>
@@ -542,11 +598,9 @@ class Display_Shops {
                 </div>
             </div>
         </div>
-    
+
         <?php
         return ob_get_clean();
     }
-    
-
 
 }
