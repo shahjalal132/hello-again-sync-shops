@@ -12,6 +12,45 @@ class Display_Shops {
 
     private $item_to_display;
 
+    private $blocked_domains = [
+        'gmail.com',
+        'googlemail.com',
+        'hotmail.com',
+        'outlook.com',
+        'live.com',
+        'msn.com',
+        'yahoo.com',
+        'yahoo.co.uk',
+        'yahoo.de',
+        'yahoo.fr',
+        'yahoo.in',
+        'gmx.com',
+        'gmx.de',
+        'gmx.net',
+        'gmx.at',
+        'gmx.ch',
+        'icloud.com',
+        'me.com',
+        'mac.com',
+        'aol.com',
+        'protonmail.com',
+        'proton.me',
+        'zoho.com',
+        'zoho.eu',
+        'zoho.in',
+        'mail.com',
+        'email.com',
+        'usa.com',
+        'dr.com',
+        'post.com',
+        'consultant.com',
+        'yandex.com',
+        'yandex.ru',
+        'yandex.ua',
+        'yandex.kz',
+        'yandex.by',
+    ];
+
     public function __construct() {
         $this->setup_hooks();
     }
@@ -118,10 +157,10 @@ class Display_Shops {
                             if ( $email ) {
                                 $email_parts = explode( '@', $email );
                                 if ( isset( $email_parts[1] ) ) {
-                                    $email_domain    = strtolower( $email_parts[1] );
-                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
-            
-                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                    $email_domain = strtolower( $email_parts[1] );
+
+
+                                    if ( !in_array( $email_domain, $this->blocked_domains, true ) && $website ) {
                                         ?>
                                         <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
                                             Website</a>
@@ -242,10 +281,9 @@ class Display_Shops {
                             if ( $email ) {
                                 $email_parts = explode( '@', $email );
                                 if ( isset( $email_parts[1] ) ) {
-                                    $email_domain    = strtolower( $email_parts[1] );
-                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
-            
-                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                    $email_domain = strtolower( $email_parts[1] );
+
+                                    if ( !in_array( $email_domain, $this->blocked_domains, true ) && $website ) {
                                         ?>
                                         <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
                                             Website</a>
@@ -421,10 +459,9 @@ class Display_Shops {
                             if ( $email ) {
                                 $email_parts = explode( '@', $email );
                                 if ( isset( $email_parts[1] ) ) {
-                                    $email_domain    = strtolower( $email_parts[1] );
-                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
-            
-                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                    $email_domain = strtolower( $email_parts[1] );
+
+                                    if ( !in_array( $email_domain, $this->blocked_domains, true ) && $website ) {
                                         ?>
                                         <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
                                             Website</a>
@@ -566,10 +603,9 @@ class Display_Shops {
                                             if ( $email ) {
                                                 $email_parts = explode( '@', $email );
                                                 if ( isset( $email_parts[1] ) ) {
-                                                    $email_domain    = strtolower( $email_parts[1] );
-                                                    $blocked_domains = [ 'gmail.com', 'gmx.de', 'gmx.net', 'gmx.at' ]; // Add more if needed
-                            
-                                                    if ( !in_array( $email_domain, $blocked_domains, true ) && $website ) {
+                                                    $email_domain = strtolower( $email_parts[1] );
+
+                                                    if ( !in_array( $email_domain, $this->blocked_domains, true ) && $website ) {
                                                         ?>
                                                         <a href="<?php echo esc_url( $website ); ?>" class="link color-gold" target="_blank">zur
                                                             Website</a>
